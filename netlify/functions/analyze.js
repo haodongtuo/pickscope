@@ -1,5 +1,6 @@
 const https = require("https");
 const { findRelevantMechanisms, formatMechanismContext } = require("./mechanisms");
+const { findRelevantIngredients, formatStabilityContext } = require("./stability_ingredients");
 
 function httpsPost(options, body) {
   return new Promise((resolve, reject) => {
@@ -261,9 +262,14 @@ IMPORTANT for mechanism_insight: If the user mentions something they have alread
   // Mechanism knowledge base injection
   const relevantMechanisms = findRelevantMechanisms(query, 2);
   const mechanismContext = formatMechanismContext(relevantMechanisms);
-  const finalSystemPrompt = mechanismContext
-    ? systemPrompt + mechanismContext
-    : systemPrompt;
+
+  // Stability knowledge base injection
+  const relevantIngredients = findRelevantIngredients(query, 3);
+  const stabilityContext = formatStabilityContext(relevantIngredients);
+
+  const finalSystemPrompt = systemPrompt
+    + (mechanismContext || "")
+    + (stabilityContext || "");
 
   const requestBody = JSON.stringify({
     model: "gpt-4o",
