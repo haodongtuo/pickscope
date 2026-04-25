@@ -356,8 +356,8 @@ main {
       <input type="file" id="label-file-input" accept="image/*" multiple>
     </div>
     <div class="label-preview" id="label-preview"></div>
-    <div id="label-note-wrap" style="display:none;margin-top:12px;">
-      <textarea id="label-note" placeholder="(Optional) Any specific question? e.g. Is this dose too high? Is it safe with blood thinners?" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:0.88rem;padding:12px 14px;resize:vertical;min-height:68px;line-height:1.6;outline:none;font-family:inherit;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+    <div style="margin-top:12px;">
+      <textarea id="label-note" placeholder="(Optional) Ask anything — upload a label above, or just type a question: e.g. Is 500mg of magnesium oxide too high?" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:0.88rem;padding:12px 14px;resize:vertical;min-height:68px;line-height:1.6;outline:none;font-family:inherit;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'" oninput="updateLabelBtn()"></textarea>
       <div style="font-size:0.75rem;color:var(--text3);margin-top:6px;">Sabe escribir en español · 日本語でも入力できます · 可以用中文输入 · 한국어로도 입력 가능 · Input in any language</div>
     </div>
     <button class="analyze-label-btn" id="analyze-label-btn" style="display:none">Analyze Label</button>
@@ -806,8 +806,14 @@ function renderError(msg) {
 const dropZone       = document.getElementById('drop-zone');
 const fileInput      = document.getElementById('label-file-input');
 const labelPreview   = document.getElementById('label-preview');
-const labelNoteWrap  = document.getElementById('label-note-wrap');
 const labelNote      = document.getElementById('label-note');
+
+function updateLabelBtn() {
+  const hasImage = labelFiles.length > 0;
+  const hasText  = labelNote.value.trim().length > 0;
+  analyzeLabelBtn.style.display = (hasImage || hasText) ? 'block' : 'none';
+  analyzeLabelBtn.textContent = hasImage ? 'Analyze Label' : 'Ask Question';
+}
 const analyzeLabelBtn = document.getElementById('analyze-label-btn');
 const labelResultArea = document.getElementById('label-result-area');
 let labelFiles = [];
@@ -853,8 +859,7 @@ function handleFiles(files) {
     hint.addEventListener('click', () => fileInput.click());
     labelPreview.appendChild(hint);
   }
-  analyzeLabelBtn.style.display = labelFiles.length ? 'block' : 'none';
-  labelNoteWrap.style.display = labelFiles.length ? 'block' : 'none';
+  updateLabelBtn();
 }
 
 analyzeLabelBtn.addEventListener('click', async () => {
@@ -889,7 +894,6 @@ function resetLabelAnalyzer() {
   labelPreview.innerHTML = '';
   labelResultArea.innerHTML = '';
   labelNote.value = '';
-  labelNoteWrap.style.display = 'none';
   analyzeLabelBtn.style.display = 'none';
   dropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
@@ -923,14 +927,14 @@ function renderLabelResult(d) {
       <div style="font-size:0.85rem;color:var(--text2);margin-bottom:10px;font-style:italic;">"${d.user_question_response.question}"</div>
       <div style="font-size:0.9rem;color:var(--text);line-height:1.7;">${d.user_question_response.direct_answer}</div>
     </div>` : ''}
-    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
+    ${score && d.product_name !== 'No label uploaded' ? `<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
       ${scoreRingHTML(score, '#4A9EFF')}
       <div>
         <h2>${d.product_name || 'Unknown Product'}</h2>
         <div class="label-brand">${[d.brand, d.serving_size, d.servings_per_container ? d.servings_per_container+' servings' : ''].filter(Boolean).join(' · ')}</div>
         ${certs.length ? `<div class="certs" style="margin-top:8px;">${certs.map(c=>`<span class="cert-pill">${c}</span>`).join('')}</div>` : ''}
       </div>
-    </div>
+    </div>` : ''}
     ${ingrs.length ? `
     <div class="label-section">
       <h4>Key Ingredients</h4>

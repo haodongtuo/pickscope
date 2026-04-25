@@ -38,8 +38,11 @@ exports.handler = async function (event) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid request body" }) };
   }
 
-  if (!imagesBase64 || !Array.isArray(imagesBase64) || imagesBase64.length === 0) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "No images provided" }) };
+  const hasImages = imagesBase64 && Array.isArray(imagesBase64) && imagesBase64.length > 0;
+  const hasNote   = userNote && userNote.trim().length > 0;
+
+  if (!hasImages && !hasNote) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Please upload a label image or enter a question." }) };
   }
 
   const apiKey = process.env.VITE_OPENAI_API_KEY;
@@ -47,14 +50,14 @@ exports.handler = async function (event) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "API key not configured" }) };
   }
 
-  // Build image content array for vision API
-  const imageContents = imagesBase64.map((img) => ({
+  // Build image content array for vision API (may be empty)
+  const imageContents = hasImages ? imagesBase64.map((img) => ({
     type: "image_url",
     image_url: {
       url: img.startsWith("data:") ? img : `data:image/jpeg;base64,${img}`,
       detail: "high"
     }
-  }));
+  })) : [];
 
   const systemPrompt = `You are PickScope Label Analyzer, an elite supplement scientist and formulation auditor.
 
@@ -147,9 +150,11 @@ Return a JSON object with this EXACT structure:
         content: [
           {
             type: "text",
-            text: userNote
-              ? `User's specific question: "${userNote}"\n\nIMPORTANT: Detect the language of the user's question and respond ENTIRELY in that language (including all analysis, findings, and recommendations). Make sure your analysis directly addresses their specific question in addition to the full-stack audit.\n\nPlease perform a full-stack audit on this supplement label.`
-              : "Please perform a full-stack audit on this supplement label. Identify all ingredients, then run stability audit, interaction detection, and redundancy analysis."
+            text: hasImages
+              ? (userNote
+                  ? `User's specific question: "${userNote}"\n\nIMPORTANT: Detect the language of the user's question and respond ENTIRELY in that language. Directly address their question first, then run the full-stack audit.\n\nPlease perform a full-stack audit on this supplement label.`
+                  : "Please perform a full-stack audit on this supplement label. Identify all ingredients, then run stability audit, interaction detection, and redundancy analysis.")
+              : `The user has no label image to upload. They are asking a direct supplement question: "${userNote}"\n\nIMPORTANT: Detect the language of the question and respond ENTIRELY in that language.\n\nSince there is no label image, return a simplified JSON with only these fields: "product_name" (set to "No label uploaded"), "key_ingredients" (extract any ingredients mentioned in the question), "analysis" (summary/strengths/concerns/quality_score set to null), "stability_audit", "stack_analysis", and "user_question_response" (REQUIRED — directly answer their question with scientific detail). Set stability_audit.triggered and stack_analysis.triggered based on whether the question involves specific ingredients.`
           },
           ...imageContents
         ]
