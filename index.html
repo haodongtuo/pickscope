@@ -687,6 +687,57 @@ function renderStabilityAudit(sa) {
     </div>`;
 }
 
+// ── Stack Analysis Card ───────────────────────────────────────
+function renderStackAnalysis(sa) {
+  if (!sa || !sa.triggered) return '';
+  const hasRedundancy = sa.redundancy_warnings?.length > 0;
+  const hasSynergy = sa.synergy_highlights?.length > 0;
+  if (!hasRedundancy && !hasSynergy && !sa.overall_verdict) return '';
+
+  const redundancyHtml = (sa.redundancy_warnings || []).map(r => `
+    <div style="background:rgba(0,0,0,0.2);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid #FF9500;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:1rem;">🔁</span>
+        <span style="font-size:0.82rem;font-weight:700;color:#FF9500;">REDUNDANCY — ${(r.ingredients||[]).join(' + ')}</span>
+      </div>
+      <div style="font-size:0.75rem;color:var(--accent);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;">${r.shared_pathway||''}</div>
+      <p style="font-size:0.84rem;color:var(--text2);line-height:1.6;margin-bottom:6px;">${r.explanation||''}</p>
+      ${r.recommendation ? `<div style="font-size:0.82rem;color:#3ECF8E;line-height:1.5;display:flex;gap:6px;"><span>→</span><span>${r.recommendation}</span></div>` : ''}
+    </div>`).join('');
+
+  const synergyHtml = (sa.synergy_highlights || []).map(s => `
+    <div style="background:rgba(62,207,142,0.06);border:1px solid rgba(62,207,142,0.2);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:1rem;">✨</span>
+        <span style="font-size:0.82rem;font-weight:700;color:#3ECF8E;">SYNERGY — ${(s.ingredients||[]).join(' + ')}</span>
+        ${s.synergy_type ? `<span style="font-size:0.7rem;color:var(--text2);background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:4px;">${s.synergy_type}</span>` : ''}
+      </div>
+      <p style="font-size:0.84rem;color:var(--text2);line-height:1.6;">${s.explanation||''}</p>
+    </div>`).join('');
+
+  return `
+    <div style="
+      background: linear-gradient(135deg, rgba(74,158,255,0.06) 0%, rgba(62,207,142,0.06) 100%);
+      border: 1px solid rgba(74,158,255,0.2);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-top: 16px;
+    ">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="font-size:1.2rem;">🧬</span>
+        <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;">Stack Intelligence Audit</span>
+      </div>
+      <div style="font-size:0.84rem;color:var(--text2);margin-bottom:14px;margin-top:4px;">Multi-ingredient interaction, redundancy & synergy analysis</div>
+      ${redundancyHtml}
+      ${synergyHtml}
+      ${sa.overall_verdict ? `
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(74,158,255,0.15);">
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">Formulation Verdict</div>
+          <p style="font-size:0.85rem;color:var(--text2);line-height:1.7;">${sa.overall_verdict}</p>
+        </div>` : ''}
+    </div>`;
+}
+
 // ── Full results ──────────────────────────────────────────────
 function renderResults(data) {
   const cards = (data.products || []).map(renderCard).join('');
@@ -835,6 +886,8 @@ function renderLabelResult(d) {
     <div class="label-section"><h4>✅ Strengths</h4><p>${d.analysis?.strengths||'—'}</p></div>
     <div class="label-section"><h4>⚠️ Concerns</h4><p>${d.analysis?.concerns||'—'}</p></div>
     ${d.suggested_use ? `<div class="label-section"><h4>Suggested Use</h4><p>${d.suggested_use}</p></div>` : ''}
+    ${renderStabilityAudit(d.stability_audit)}
+    ${renderStackAnalysis(d.stack_analysis)}
   </div>`;
 }
 </script>
