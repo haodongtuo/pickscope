@@ -128,6 +128,14 @@ Return a JSON object with this EXACT structure:
 - For stack_analysis: scan ALL ingredient pairs for redundancy. A stack with 8+ ingredients almost always has at least one redundancy or one genuine synergy worth calling out.
 - Be specific and scientific — avoid generic marketing language. Name the exact biological pathway, enzyme, or receptor involved.
 - quality_score: score 0–100 based on ingredient form quality, dose adequacy, evidence tier, and formulation logic. Do not inflate scores. A product with inferior forms or underdosed ingredients should score 50–70.
+- If the user provided a specific question, add a "user_question_response" field at the TOP LEVEL of the JSON:
+  {
+    "user_question_response": {
+      "question": "Repeat the user's original question exactly",
+      "direct_answer": "Start with a direct, opinionated answer to their question (e.g. '关于你问的剂量问题：这个产品的钙剂量（每日1260mg）处于安全范围上限...'). Be specific — cite the actual numbers from the label and compare to established safe upper limits or clinical guidelines. 3-5 sentences max. Write in the same language as the user's question."
+    }
+  }
+  This field is ONLY included when the user provides a question. If no question, omit it entirely.
 - Return ONLY the JSON object, no markdown, no extra text.`;
 
   const requestBody = JSON.stringify({

@@ -914,6 +914,15 @@ function renderLabelResult(d) {
         ← New Analysis
       </button>
     </div>
+    ${d.user_question_response ? `
+    <div style="background:linear-gradient(135deg,rgba(74,158,255,0.1) 0%,rgba(109,179,255,0.06) 100%);border:1px solid rgba(74,158,255,0.35);border-radius:14px;padding:16px 20px;margin-bottom:18px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:1.1rem;">💬</span>
+        <span style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;">Your Question</span>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:10px;font-style:italic;">"${d.user_question_response.question}"</div>
+      <div style="font-size:0.9rem;color:var(--text);line-height:1.7;">${d.user_question_response.direct_answer}</div>
+    </div>` : ''}
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
       ${scoreRingHTML(score, '#4A9EFF')}
       <div>
