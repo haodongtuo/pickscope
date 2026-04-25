@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PickScope — Science-backed Supplement Recommendations</title>
+<style>
+:root {
+  --bg: #0f0f0f;
+  --bg2: #1a1a1a;
+  --bg3: #242424;
+  --border: #2e2e2e;
+  --accent: #4A9EFF;
+  --accent2: #6db3ff;
+  --blue: #4A9EFF;
+  --green: #3ECF8E;
+  --orange: #FF9500;
+  --text: #f0f0f0;
+  --text2: #a0a0a0;
+  --text3: #505050;
+  --radius: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.logo { display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; }
+.logo img { width: 72px; height: 72px; border-radius: 16px; }
+.logo-text { font-size: 1.8rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+.logo-text span { color: var(--accent); }
+.tagline { color: var(--text2); font-size: 0.84rem; margin-top: 2px; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+  justify-content: center;
+}
+.tab-btn {
+  background: none; border: none;
+  color: var(--text2); font-size: 0.93rem; font-weight: 600;
+  padding: 10px 20px; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all 0.2s;
+}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+
+/* ── MAIN ── */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: flex; flex-direction: column; }
+
+/* ── SEARCH (centered vertically when no results) ── */
+#tab-recommender { align-items: center; }
+.search-wrap {
+  width: 100%;
+  max-width: 680px;
+  padding-top: 80px;
+  transition: padding-top 0.4s ease;
+}
+.search-wrap.has-results { padding-top: 36px; }
+.search-box {
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  transition: border-color 0.2s;
+}
+.search-box:focus-within { border-color: var(--accent); }
+.search-box textarea {
+  width: 100%; background: none; border: none; outline: none;
+  color: var(--text); font-size: 1rem; line-height: 1.6;
+  resize: none; font-family: inherit;
+}
+.search-box textarea::placeholder { color: var(--text3); }
+.search-btn {
+  width: 100%;
+  background: var(--accent); border: none; color: #fff;
+  font-weight: 700; font-size: 1rem;
+  padding: 14px; border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background 0.2s; margin-top: 10px;
+}
+.search-btn:hover { background: var(--accent2); }
+.search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.lang-hint {
+  font-size: 0.68rem;
+  color: #383838;
+  font-family: monospace;
+  text-align: center;
+  line-height: 1.6;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  pointer-events: none;
+  user-select: none;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; justify-content: center; }
+.chip {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); font-size: 0.81rem;
+  padding: 6px 14px; border-radius: 20px; cursor: pointer;
+  transition: all 0.15s;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── RESULTS AREA ── */
+#results-area { width: 100%; }
+
+/* ── SKELETON ── */
+.skeleton-wrap { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 36px; }
+.skeleton-card { background: var(--bg2); border-radius: var(--radius); padding: 24px; }
+.skel {
+  background: linear-gradient(90deg, var(--bg3) 25%, #2c2c2c 50%, var(--bg3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+.skel-h { height: 13px; margin-bottom: 10px; }
+.skel-circle { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 16px; }
+.skel-bar { height: 7px; margin-bottom: 9px; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ── CARDS ── */
+.cards-wrap { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 36px; }
+.card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+  display: flex; flex-direction: column; gap: 15px;
+  animation: fadeUp 0.4s ease both;
+}
+.card:nth-child(2) { animation-delay: 0.08s; }
+.card:nth-child(3) { animation-delay: 0.16s; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── BADGES ── */
+.badge { display: inline-block; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.07em; padding: 4px 10px; border-radius: 20px; }
+.badge-best   { background: rgba(74,158,255,0.12); color: #4A9EFF; border: 1px solid rgba(74,158,255,0.28); }
+.badge-runner { background: rgba(255,149,0,0.12);  color: var(--orange); border: 1px solid rgba(255,149,0,0.28); }
+.badge-budget { background: rgba(62,207,142,0.12); color: var(--green);  border: 1px solid rgba(62,207,142,0.28); }
+
+.card-name { font-size: 0.94rem; font-weight: 700; line-height: 1.45; }
+
+/* ── META ── */
+.card-meta { display: flex; gap: 10px; font-size: 0.79rem; color: var(--text2); flex-wrap: wrap; align-items: center; }
+.stars { color: #f5a623; }
+
+/* ── CERTS ── */
+.certs { display: flex; flex-wrap: wrap; gap: 6px; }
+.cert-pill {
+  background: rgba(62,207,142,0.08); border: 1px solid rgba(62,207,142,0.22);
+  color: var(--green); font-size: 0.68rem; font-weight: 600;
+  padding: 3px 9px; border-radius: 12px;
+}
+
+/* ── DIMENSION BARS ── */
+.dimensions { display: flex; flex-direction: column; gap: 9px; }
+.dim-row { display: flex; flex-direction: column; gap: 3px; }
+.dim-label-row { display: flex; justify-content: space-between; font-size: 0.71rem; }
+.dim-name { color: var(--text2); }
+.dim-pct { color: var(--text); font-weight: 600; }
+.dim-track { height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.dim-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 1s ease; }
+
+/* ── ACCORDION ── */
+.accordion { display: flex; flex-direction: column; gap: 4px; }
+.acc-trigger {
+  width: 100%; background: var(--bg3); border: none; border-radius: 8px;
+  color: var(--text); font-size: 0.81rem; font-weight: 600;
+  padding: 10px 12px; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  text-align: left; transition: background 0.15s;
+}
+.acc-trigger:hover { background: #2c2c2c; }
+.acc-arrow { color: var(--text3); transition: transform 0.2s; font-size: 0.85rem; flex-shrink: 0; }
+.acc-trigger.open .acc-arrow { transform: rotate(180deg); }
+.acc-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+.acc-body.open { max-height: 500px; }
+.acc-content {
+  padding: 10px 12px; font-size: 0.79rem; color: var(--text2); line-height: 1.65;
+  background: var(--bg3); border-radius: 0 0 8px 8px; margin-top: 1px;
+}
+
+/* ── AMAZON BTN ── */
+.amazon-btn {
+  display: block; background: var(--accent); color: #fff;
+  text-align: center; text-decoration: none;
+  font-weight: 700; font-size: 0.87rem;
+  padding: 12px; border-radius: 10px;
+  transition: background 0.2s; margin-top: auto;
+}
+.amazon-btn:hover { background: var(--accent2); }
+
+/* ── CITATIONS ── */
+.citations-wrap { margin-top: 28px; width: 100%; }
+.citations-toggle {
+  background: none; border: 1px solid var(--border);
+  color: var(--text2); font-size: 0.84rem; font-weight: 600;
+  padding: 10px 18px; border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; transition: all 0.2s;
+}
+.citations-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.citations-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.citation-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+.citation-item a { color: var(--blue); font-size: 0.84rem; font-weight: 600; text-decoration: none; }
+.citation-item a:hover { text-decoration: underline; }
+.citation-journal { color: var(--text2); font-size: 0.76rem; margin-top: 3px; }
+
+/* ── ERROR ── */
+.error-box {
+  background: rgba(255,80,80,0.07); border: 1px solid rgba(255,80,80,0.18);
+  border-radius: var(--radius); padding: 28px; text-align: center; margin-top: 32px; width: 100%;
+}
+.error-box h3 { color: #ff6b6b; margin-bottom: 8px; }
+.error-box p { color: var(--text2); font-size: 0.88rem; margin-bottom: 16px; }
+.retry-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); font-weight: 600; padding: 10px 24px;
+  border-radius: 8px; cursor: pointer; transition: all 0.2s;
+}
+.retry-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── LABEL ANALYZER ── */
+#tab-label { padding-top: 32px; }
+.drop-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 52px 28px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: var(--bg2);
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(74,158,255,0.04); }
+.drop-zone .dz-icon { font-size: 2.4rem; margin-bottom: 14px; }
+.drop-zone h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+.drop-zone .dz-sub { color: var(--text2); font-size: 0.84rem; }
+.drop-zone .dz-tip {
+  margin-top: 14px; color: var(--text3); font-size: 0.77rem; line-height: 1.6;
+  background: var(--bg3); border-radius: 8px; padding: 10px 16px; display: inline-block;
+}
+#label-file-input { display: none; }
+.label-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.preview-img { width: 82px; height: 82px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+.analyze-label-btn {
+  background: var(--accent); border: none; color: #fff;
+  font-weight: 700; font-size: 0.93rem; padding: 13px 30px;
+  border-radius: 10px; cursor: pointer; margin-top: 14px;
+  transition: background 0.2s;
+}
+.analyze-label-btn:hover { background: var(--accent2); }
+.analyze-label-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.label-result {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 26px; margin-top: 22px;
+}
+.label-result h2 { font-size: 1.08rem; margin-bottom: 4px; }
+.label-brand { color: var(--text2); font-size: 0.84rem; margin-bottom: 16px; }
+.ingr-table { width: 100%; border-collapse: collapse; font-size: 0.81rem; margin-top: 10px; }
+.ingr-table th { text-align: left; padding: 8px 12px; background: var(--bg3); color: var(--text2); font-weight: 600; }
+.ingr-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); }
+.label-section { margin-top: 16px; }
+.label-section h4 { font-size: 0.82rem; font-weight: 700; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+.label-section p { font-size: 0.87rem; line-height: 1.65; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 820px) {
+  .cards-wrap, .skeleton-wrap { grid-template-columns: 1fr; }
+  .search-btn { width: 100%; justify-content: center; }
+  .search-box { flex-wrap: wrap; }
+  .search-wrap { padding-top: 40px; }
+}
+@media (max-width: 500px) {
+  header { padding: 22px 16px 0; }
+  main { padding: 0 16px 40px; }
+  .logo-text { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">
+    <img src="logo.png" alt="PickScope logo">
+    <div class="logo-text">Pick<span>Scope</span></div>
+    <div class="tagline">Science-backed supplement recommendations</div>
+  </a>
+  <div class="tabs" style="margin-top:24px;">
+    <button class="tab-btn active" data-tab="recommender">🔍 AI Recommender</button>
+    <button class="tab-btn" data-tab="label">🏷️ Label Analyzer</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- TAB 1: Recommender -->
+  <div class="tab-panel active" id="tab-recommender">
+    <div class="search-wrap" id="search-wrap">
+      <div class="search-box">
+        <textarea id="query-input" rows="4"
+          placeholder="e.g. I am a 50yo female, experiencing hot flashes and poor sleep. My budget is under $30, and I prefer capsules over tablets..."
+          autocomplete="off"></textarea>
+        <div class="lang-hint">
+          Sabe escribir en español · 日本語でも入力できます · 可以用中文输入 · 한국어로도 입력 가능 · Input in any language
+        </div>
+      </div>
+      <button class="search-btn" id="search-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Analyze
+      </button>
+      <div class="chips">
+        <div class="chip">Better sleep</div>
+        <div class="chip">Muscle recovery</div>
+        <div class="chip">Brain focus</div>
+        <div class="chip">Immune support</div>
+        <div class="chip">Joint health</div>
+        <div class="chip">Energy boost</div>
+        <div class="chip">Reduce anxiety</div>
+      </div>
+    </div>
+    <div id="results-area"></div>
+  </div>
+
+  <!-- TAB 2: Label Analyzer -->
+  <div class="tab-panel" id="tab-label">
+    <div class="drop-zone" id="drop-zone">
+      <div class="dz-icon">📷</div>
+      <h3>Upload Supplement Label</h3>
+      <p class="dz-sub">Drag &amp; drop images here, or click to browse</p>
+      <div class="dz-tip">
+        ⚠️ Upload up to <strong>4 photos</strong> of the same product label<br>
+        Do <strong>not</strong> mix photos from different products in one upload
+      </div>
+      <input type="file" id="label-file-input" accept="image/*" multiple>
+    </div>
+    <div class="label-preview" id="label-preview"></div>
+    <button class="analyze-label-btn" id="analyze-label-btn" style="display:none">Analyze Label</button>
+    <div id="label-result-area"></div>
+  </div>
+
+</main>
+
+<script>
+// ── Click tracking ───────────────────────────────────────────
+function logClick(productName, affiliateLink) {
+  fetch('/.netlify/functions/log_click', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: lastQuery,
+      product_name: productName,
+      platform: 'Amazon',
+      affiliate_link: affiliateLink
+    })
+  }).catch(err => console.error('Click log error:', err));
+}
+
+// ── Reset to search ──────────────────────────────────────────
+function resetSearch() {
+  document.getElementById('results-area').innerHTML = '';
+  document.getElementById('search-wrap').classList.remove('has-results');
+  document.getElementById('query-input').value = '';
+  document.getElementById('query-input').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Tab switching ─────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Chips ─────────────────────────────────────────────────────
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.getElementById('query-input').value = chip.textContent;
+    document.getElementById('search-btn').click();
+  });
+});
+
+// ── Search ────────────────────────────────────────────────────
+const searchBtn  = document.getElementById('search-btn');
+const queryInput = document.getElementById('query-input');
+const resultsArea = document.getElementById('results-area');
+const searchWrap  = document.getElementById('search-wrap');
+let lastQuery = '';
+
+queryInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); searchBtn.click(); }
+});
+
+searchBtn.addEventListener('click', () => {
+  const query = queryInput.value.trim();
+  if (!query) return;
+  lastQuery = query;
+  runSearch(query);
+});
+
+async function runSearch(query) {
+  searchBtn.disabled = true;
+  searchWrap.classList.add('has-results');
+  resultsArea.innerHTML = renderSkeletons();
+  try {
+    const res = await fetch('/.netlify/functions/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    resultsArea.innerHTML = renderResults(data);
+    initAccordions();
+    animateBars();
+    initCitations();
+  } catch (err) {
+    resultsArea.innerHTML = renderError(err.message);
+    const rb = document.getElementById('retry-btn');
+    if (rb) rb.addEventListener('click', () => runSearch(lastQuery));
+  } finally {
+    searchBtn.disabled = false;
+  }
+}
+
+// ── Skeletons ─────────────────────────────────────────────────
+function renderSkeletons() {
+  return `<div class="skeleton-wrap">${[1,2,3].map(() => `
+    <div class="skeleton-card">
+      <div class="skel skel-h" style="width:55%"></div>
+      <div class="skel skel-circle"></div>
+      <div class="skel skel-h" style="width:88%"></div>
+      <div class="skel skel-h" style="width:70%"></div>
+      ${[1,2,3,4,5,6,7].map(() => `<div class="skel skel-bar"></div>`).join('')}
+    </div>`).join('')}</div>`;
+}
+
+// ── Score ring HTML ───────────────────────────────────────────
+function scoreRingHTML(score, color) {
+  const r = 36, circ = 2 * Math.PI * r;
+  const dash = (circ * score / 100).toFixed(2);
+  const gap  = (circ - circ * score / 100).toFixed(2);
+  return `
+  <div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <svg style="position:absolute;top:0;left:0;" width="90" height="90" viewBox="0 0 90 90">
+      <circle fill="none" stroke="#242424" stroke-width="8" cx="45" cy="45" r="${r}"/>
+      <circle fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
+        cx="45" cy="45" r="${r}"
+        stroke-dasharray="${dash} ${gap}"
+        transform="rotate(-90 45 45)"/>
+    </svg>
+    <div style="text-align:center;z-index:1;">
+      <div style="font-size:1.35rem;font-weight:800;line-height:1;">${score}</div>
+      <div style="font-size:0.66rem;color:#a0a0a0;">/ 100</div>
+    </div>
+  </div>`;
+}
+
+// ── Dimension bars ────────────────────────────────────────────
+const DIMS = [
+  { name: 'Needs Match',         weight: 25, key: 'fit'  },
+  { name: 'Scientific Evidence', weight: 20, key: 'fit'  },
+  { name: 'Bioavailability',     weight: 15, key: 'trans' },
+  { name: 'Effective Dose',      weight: 15, key: 'trans' },
+  { name: 'Safety Profile',      weight: 10, key: 'cons' },
+  { name: 'Certifications',      weight: 10, key: 'certs' },
+  { name: 'Price Value',         weight:  5, key: 'value' },
+];
+
+function estimateDimScore(dim, product, idx) {
+  const base = product.score;
+  const seed = (product.id ? product.id.charCodeAt(0) : 42) + idx * 17;
+  let variance = ((seed % 21) - 10);
+  let adj = 0;
+  const fit   = (product.reasons.fit || '').toLowerCase();
+  const trans = (product.reasons.transparency || '').toLowerCase();
+  const cons  = (product.reasons.cons || '').toLowerCase();
+  const val   = (product.reasons.value || '').toLowerCase();
+  const certs = product.certifications || [];
+
+  if (dim.key === 'fit') {
+    if (fit.includes('tier a') || fit.includes('multiple rct')) adj = 8;
+    else if (fit.includes('tier c') || fit.includes('tier d'))  adj = -10;
+  }
+  if (dim.key === 'trans') {
+    if (trans.includes('glycinate') || trans.includes('methylcobalamin') || trans.includes('liposomal')) adj = 8;
+    if (trans.includes('proprietary blend') || trans.includes('oxide') || trans.includes('inferior')) adj -= 10;
+    if (trans.includes('clinical') && trans.includes('threshold')) adj += 4;
+  }
+  if (dim.key === 'cons') {
+    if (cons.includes('interact') || cons.includes('caution') || cons.includes('avoid')) adj = -8;
+    else if (cons.length < 60) adj = 7;
+  }
+  if (dim.key === 'certs') {
+    if (certs.some(c => /nsf|usp|informed/i.test(c))) adj = 12;
+    else if (certs.some(c => /gmp/i.test(c))) adj = 4;
+    else if (certs.length === 0) adj = -10;
+  }
+  if (dim.key === 'value') {
+    if (val.includes('excellent value') || val.includes('best value')) adj = 8;
+    if (val.includes('expensive') || val.includes('premium price')) adj = -5;
+  }
+  return Math.min(100, Math.max(38, base + variance + adj));
+}
+
+function renderDimBars(product) {
+  return `<div class="dimensions">
+    ${DIMS.map((dim, i) => {
+      const val = estimateDimScore(dim, product, i);
+      return `<div class="dim-row" data-val="${val}">
+        <div class="dim-label-row">
+          <span class="dim-name">${dim.name}</span>
+          <span class="dim-pct">${val}</span>
+        </div>
+        <div class="dim-track"><div class="dim-fill" style="width:0%"></div></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function animateBars() {
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.dim-row').forEach(row => {
+      row.querySelector('.dim-fill').style.width = row.dataset.val + '%';
+    });
+  });
+}
+
+// ── Stars ─────────────────────────────────────────────────────
+function renderStars(rating) {
+  let s = '';
+  const full = Math.floor(rating);
+  for (let i = 0; i < full; i++) s += '★';
+  if (rating - full >= 0.5) s += '½';
+  return `<span class="stars">${s}</span> ${rating}`;
+}
+
+// ── Badge / ring color ────────────────────────────────────────
+function badgeClass(t) {
+  if (t === 'BEST MATCH') return 'badge-best';
+  if (t === 'RUNNER UP')  return 'badge-runner';
+  return 'badge-budget';
+}
+function ringColor(t) {
+  if (t === 'BEST MATCH') return '#4A9EFF';
+  if (t === 'RUNNER UP')  return '#FF9500';
+  return '#3ECF8E';
+}
+
+// ── Card ──────────────────────────────────────────────────────
+function renderCard(p) {
+  const certs = p.certifications || [];
+  const reviewK = p.review_count >= 1000
+    ? (p.review_count / 1000).toFixed(1) + 'k'
+    : (p.review_count || '—');
+
+  return `
+  <div class="card">
+    <span class="badge ${badgeClass(p.match_type)}">${p.match_type}</span>
+    <div class="card-name">${p.name}</div>
+
+    <div style="display:flex;justify-content:center;padding:2px 0;">
+      ${scoreRingHTML(p.score, ringColor(p.match_type))}
+    </div>
+
+    <div class="card-meta">
+      <span>💲${p.price || '—'}</span>
+      <span>${renderStars(p.rating || 0)}</span>
+      <span style="color:var(--text3)">(${reviewK})</span>
+    </div>
+
+    ${certs.length ? `<div class="certs">${certs.map(c=>`<span class="cert-pill">${c}</span>`).join('')}</div>` : ''}
+
+    ${renderDimBars(p)}
+
+    <div class="accordion">
+      ${acc('🎯 Why It Fits',        p.reasons.fit          || '—')}
+      ${acc('🔬 Ingredient Quality', p.reasons.transparency || '—')}
+      ${acc('💰 Value Analysis',     p.reasons.value        || '—')}
+      ${acc('⚠️ Considerations',     p.reasons.cons         || '—')}
+    </div>
+
+    <a class="amazon-btn" href="${p.affiliate_link}" target="_blank" rel="noopener"
+      onclick="logClick(${JSON.stringify(p.name)}, ${JSON.stringify(p.affiliate_link)})">View on Amazon →</a>
+  </div>`;
+}
+
+function acc(label, content) {
+  return `<div class="acc-item">
+    <button class="acc-trigger"><span>${label}</span><span class="acc-arrow">▾</span></button>
+    <div class="acc-body"><div class="acc-content">${content}</div></div>
+  </div>`;
+}
+
+// ── Mechanism Insight Card ────────────────────────────────────
+function renderMechanismInsight(mi) {
+  if (!mi || !mi.mechanism_name) return '';
+  return `
+    <div style="
+      background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.08) 100%);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    ">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <span style="font-size:1.2rem;">🔬</span>
+        <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;">Root Mechanism Analysis</span>
+      </div>
+      <div style="font-size:0.95rem;font-weight:700;color:var(--text1);margin-bottom:6px;">${mi.mechanism_name}</div>
+      <div style="font-size:0.88rem;color:var(--text2);line-height:1.6;margin-bottom:8px;">${mi.plain_explanation}</div>
+      ${mi.why_it_matters ? `<div style="font-size:0.82rem;color:var(--accent);font-style:italic;line-height:1.5;border-top:1px solid rgba(99,102,241,0.15);padding-top:8px;margin-top:4px;">💡 ${mi.why_it_matters}</div>` : ''}
+    </div>`;
+}
+
+// ── Stability Audit Card ──────────────────────────────────────
+function renderStabilityAudit(sa) {
+  if (!sa || !sa.triggered || (!sa.findings?.length && !sa.interaction_warnings?.length)) return '';
+
+  const riskColor = { HIGH: '#FF453A', MEDIUM: '#FF9500', LOW: '#3ECF8E' };
+  const severityColor = { CRITICAL: '#FF453A', MODERATE: '#FF9500', LOW: '#3ECF8E' };
+
+  const findingsHtml = (sa.findings || []).map(f => `
+    <div style="background:rgba(0,0,0,0.25);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:3px solid ${riskColor[f.risk_level]||'#FF9500'};">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:0.7rem;font-weight:800;letter-spacing:0.08em;color:${riskColor[f.risk_level]||'#FF9500'};text-transform:uppercase;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:4px;">${f.risk_level} RISK</span>
+        <span style="font-size:0.85rem;font-weight:700;color:var(--text);">${f.ingredient} — ${f.issue}</span>
+      </div>
+      <p style="font-size:0.84rem;color:var(--text2);line-height:1.6;margin-bottom:8px;">${f.detail}</p>
+      ${f.user_checklist?.length ? `
+        <div style="font-size:0.78rem;color:var(--text2);line-height:1.7;">
+          ${f.user_checklist.map(item => `<div style="display:flex;gap:6px;"><span style="color:#3ECF8E;flex-shrink:0;">✓</span><span>${item}</span></div>`).join('')}
+        </div>` : ''}
+    </div>`).join('');
+
+  const warningsHtml = (sa.interaction_warnings || []).map(w => `
+    <div style="background:rgba(255,69,58,0.06);border:1px solid rgba(255,69,58,0.2);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:1rem;">⚠️</span>
+        <span style="font-size:0.7rem;font-weight:800;letter-spacing:0.08em;color:${severityColor[w.severity]||'#FF9500'};text-transform:uppercase;">${w.severity} INTERACTION</span>
+        <span style="font-size:0.82rem;font-weight:700;color:var(--text);">${(w.pair||[]).join(' × ')}</span>
+      </div>
+      <p style="font-size:0.84rem;color:var(--text2);line-height:1.6;margin-bottom:6px;">${w.warning}</p>
+      ${w.recommendation ? `<div style="font-size:0.82rem;color:#3ECF8E;line-height:1.5;display:flex;gap:6px;"><span>→</span><span>${w.recommendation}</span></div>` : ''}
+    </div>`).join('');
+
+  return `
+    <div style="
+      background: linear-gradient(135deg, rgba(255,69,58,0.06) 0%, rgba(255,149,0,0.06) 100%);
+      border: 1px solid rgba(255,149,0,0.25);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    ">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="font-size:1.2rem;">🛡️</span>
+        <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:#FF9500;text-transform:uppercase;">Stability & Compatibility Audit</span>
+      </div>
+      ${sa.headline ? `<div style="font-size:0.88rem;color:var(--text2);margin-bottom:14px;margin-top:4px;">${sa.headline}</div>` : '<div style="margin-bottom:14px;"></div>'}
+      ${findingsHtml}
+      ${warningsHtml}
+    </div>`;
+}
+
+// ── Full results ──────────────────────────────────────────────
+function renderResults(data) {
+  const cards = (data.products || []).map(renderCard).join('');
+  const newSearchBtn = `<div style="display:flex;justify-content:flex-start;margin-bottom:8px;">
+    <button onclick="resetSearch()" style="background:none;border:1px solid var(--border);color:var(--text2);font-size:0.83rem;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
+      ← New Search
+    </button>
+  </div>`;
+  const mechanismHtml = renderMechanismInsight(data.mechanism_insight);
+  const stabilityHtml = renderStabilityAudit(data.stability_audit);
+  const cites  = data.citations || [];
+  const citHTML = cites.length ? `
+    <div class="citations-wrap">
+      <button class="citations-toggle" id="cite-toggle">
+        📚 Scientific References (${cites.length}) <span id="cite-arrow">▾</span>
+      </button>
+      <div id="cite-list" class="citations-list" style="display:none">
+        ${cites.map((c,i) => `
+          <div class="citation-item">
+            <a href="${c.link||'#'}" target="_blank" rel="noopener">${i+1}. ${c.title}</a>
+            <div class="citation-journal">${c.journal}${c.pmid?' · PMID: '+c.pmid:''}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+  return `${newSearchBtn}${mechanismHtml}${stabilityHtml}<div class="cards-wrap">${cards}</div>${citHTML}`;
+}
+
+// ── Accordion init ────────────────────────────────────────────
+function initAccordions() {
+  document.querySelectorAll('.acc-trigger').forEach(t => {
+    t.addEventListener('click', () => {
+      const body = t.nextElementSibling;
+      const open = body.classList.toggle('open');
+      t.classList.toggle('open', open);
+    });
+  });
+}
+
+// ── Citations toggle ──────────────────────────────────────────
+function initCitations() {
+  const toggle = document.getElementById('cite-toggle');
+  const list   = document.getElementById('cite-list');
+  if (!toggle) return;
+  toggle.addEventListener('click', () => {
+    const hidden = list.style.display === 'none';
+    list.style.display = hidden ? 'flex' : 'none';
+    list.style.flexDirection = 'column';
+    document.getElementById('cite-arrow').textContent = hidden ? '▴' : '▾';
+  });
+}
+
+// ── Error ─────────────────────────────────────────────────────
+function renderError(msg) {
+  return `<div class="error-box">
+    <h3>Something went wrong</h3>
+    <p>${msg || 'Failed to get recommendations. Please try again.'}</p>
+    <button class="retry-btn" id="retry-btn">Try Again</button>
+  </div>`;
+}
+
+// ── Label Analyzer ────────────────────────────────────────────
+const dropZone       = document.getElementById('drop-zone');
+const fileInput      = document.getElementById('label-file-input');
+const labelPreview   = document.getElementById('label-preview');
+const analyzeLabelBtn = document.getElementById('analyze-label-btn');
+const labelResultArea = document.getElementById('label-result-area');
+let labelFiles = [];
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  handleFiles(Array.from(e.dataTransfer.files));
+});
+fileInput.addEventListener('change', () => handleFiles(Array.from(fileInput.files)));
+
+function handleFiles(files) {
+  labelFiles = files.filter(f => f.type.startsWith('image/')).slice(0, 4);
+  labelPreview.innerHTML = '';
+  labelFiles.forEach(f => {
+    const img = document.createElement('img');
+    img.className = 'preview-img';
+    img.src = URL.createObjectURL(f);
+    labelPreview.appendChild(img);
+  });
+  analyzeLabelBtn.style.display = labelFiles.length ? 'block' : 'none';
+}
+
+analyzeLabelBtn.addEventListener('click', async () => {
+  if (!labelFiles.length) return;
+  analyzeLabelBtn.disabled = true;
+  analyzeLabelBtn.textContent = 'Analyzing...';
+  labelResultArea.innerHTML = '<div style="color:var(--text2);padding:20px 0;">Analyzing label…</div>';
+  try {
+    const imagesBase64 = await Promise.all(labelFiles.map(fileToBase64));
+    const res = await fetch('/.netlify/functions/analyze_label', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imagesBase64 })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    labelResultArea.innerHTML = renderLabelResult(data);
+  } catch (err) {
+    labelResultArea.innerHTML = renderError(err.message);
+  } finally {
+    analyzeLabelBtn.disabled = false;
+    analyzeLabelBtn.textContent = 'Analyze Label';
+  }
+});
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function renderLabelResult(d) {
+  const score = d.analysis?.quality_score || 0;
+  const ingrs = d.key_ingredients || [];
+  const certs = d.certifications || [];
+  return `
+  <div class="label-result">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
+      ${scoreRingHTML(score, '#4A9EFF')}
+      <div>
+        <h2>${d.product_name || 'Unknown Product'}</h2>
+        <div class="label-brand">${[d.brand, d.serving_size, d.servings_per_container ? d.servings_per_container+' servings' : ''].filter(Boolean).join(' · ')}</div>
+        ${certs.length ? `<div class="certs" style="margin-top:8px;">${certs.map(c=>`<span class="cert-pill">${c}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>
+    ${ingrs.length ? `
+    <div class="label-section">
+      <h4>Key Ingredients</h4>
+      <table class="ingr-table">
+        <tr><th>Ingredient</th><th>Amount</th><th>%DV</th></tr>
+        ${ingrs.map(i=>`<tr><td>${i.name}</td><td>${i.amount||'—'}</td><td>${i.dv_percent||'—'}</td></tr>`).join('')}
+      </table>
+    </div>` : ''}
+    <div class="label-section"><h4>Summary</h4><p>${d.analysis?.summary||'—'}</p></div>
+    <div class="label-section"><h4>✅ Strengths</h4><p>${d.analysis?.strengths||'—'}</p></div>
+    <div class="label-section"><h4>⚠️ Concerns</h4><p>${d.analysis?.concerns||'—'}</p></div>
+    ${d.suggested_use ? `<div class="label-section"><h4>Suggested Use</h4><p>${d.suggested_use}</p></div>` : ''}
+  </div>`;
+}
+</script>
+</body>
+</html>
