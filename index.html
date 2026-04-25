@@ -816,14 +816,37 @@ dropZone.addEventListener('drop', e => {
 fileInput.addEventListener('change', () => handleFiles(Array.from(fileInput.files)));
 
 function handleFiles(files) {
-  labelFiles = files.filter(f => f.type.startsWith('image/')).slice(0, 4);
+  const newFiles = files.filter(f => f.type.startsWith('image/'));
+  // Accumulate up to 4 photos total
+  labelFiles = [...labelFiles, ...newFiles].slice(0, 4);
+  // Re-render all previews with remove buttons
   labelPreview.innerHTML = '';
-  labelFiles.forEach(f => {
+  labelFiles.forEach((f, idx) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;display:inline-block;';
     const img = document.createElement('img');
     img.className = 'preview-img';
     img.src = URL.createObjectURL(f);
-    labelPreview.appendChild(img);
+    const btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.style.cssText = 'position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#FF453A;color:#fff;border:none;cursor:pointer;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      labelFiles.splice(idx, 1);
+      handleFiles([]); // re-render
+    });
+    wrap.appendChild(img);
+    wrap.appendChild(btn);
+    labelPreview.appendChild(wrap);
   });
+  // Show count hint
+  if (labelFiles.length > 0 && labelFiles.length < 4) {
+    const hint = document.createElement('div');
+    hint.style.cssText = 'width:82px;height:82px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:0.75rem;cursor:pointer;flex-direction:column;gap:4px;';
+    hint.innerHTML = '<span style="font-size:1.4rem;color:var(--text3);">+</span><span>Add photo</span>';
+    hint.addEventListener('click', () => fileInput.click());
+    labelPreview.appendChild(hint);
+  }
   analyzeLabelBtn.style.display = labelFiles.length ? 'block' : 'none';
 }
 
