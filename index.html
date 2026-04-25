@@ -866,6 +866,8 @@ analyzeLabelBtn.addEventListener('click', async () => {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     labelResultArea.innerHTML = renderLabelResult(data);
+    // Scroll to results
+    labelResultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {
     labelResultArea.innerHTML = renderError(err.message);
   } finally {
@@ -873,6 +875,15 @@ analyzeLabelBtn.addEventListener('click', async () => {
     analyzeLabelBtn.textContent = 'Analyze Label';
   }
 });
+
+function resetLabelAnalyzer() {
+  labelFiles = [];
+  labelPreview.innerHTML = '';
+  labelResultArea.innerHTML = '';
+  analyzeLabelBtn.style.display = 'none';
+  // Scroll back up to upload area
+  dropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
 function fileToBase64(file) {
   return new Promise((res, rej) => {
@@ -889,6 +900,11 @@ function renderLabelResult(d) {
   const certs = d.certifications || [];
   return `
   <div class="label-result">
+    <div style="display:flex;justify-content:flex-start;margin-bottom:12px;">
+      <button onclick="resetLabelAnalyzer()" style="background:none;border:1px solid var(--border);color:var(--text2);font-size:0.83rem;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
+        ← New Analysis
+      </button>
+    </div>
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
       ${scoreRingHTML(score, '#4A9EFF')}
       <div>
