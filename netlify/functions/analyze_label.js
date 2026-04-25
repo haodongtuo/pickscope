@@ -31,9 +31,9 @@ exports.handler = async function (event) {
     return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  let imagesBase64;
+  let imagesBase64, userNote;
   try {
-    ({ imagesBase64 } = JSON.parse(event.body));
+    ({ imagesBase64, userNote } = JSON.parse(event.body));
   } catch (e) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid request body" }) };
   }
@@ -137,7 +137,12 @@ Return a JSON object with this EXACT structure:
       {
         role: "user",
         content: [
-          { type: "text", text: "Please perform a full-stack audit on this supplement label. Identify all ingredients, then run stability audit, interaction detection, and redundancy analysis." },
+          {
+            type: "text",
+            text: userNote
+              ? `User's specific question: "${userNote}"\n\nIMPORTANT: Detect the language of the user's question and respond ENTIRELY in that language (including all analysis, findings, and recommendations). Make sure your analysis directly addresses their specific question in addition to the full-stack audit.\n\nPlease perform a full-stack audit on this supplement label.`
+              : "Please perform a full-stack audit on this supplement label. Identify all ingredients, then run stability audit, interaction detection, and redundancy analysis."
+          },
           ...imageContents
         ]
       }
