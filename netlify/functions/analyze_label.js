@@ -1,5 +1,4 @@
 const https = require("https");
-const { findRelevantIngredients, formatStabilityContext } = require("./stability_ingredients");
 
 function httpsPost(options, body) {
   return new Promise((resolve, reject) => {
@@ -131,23 +130,10 @@ Return a JSON object with this EXACT structure:
 - quality_score: score 0–100 based on ingredient form quality, dose adequacy, evidence tier, and formulation logic. Do not inflate scores. A product with inferior forms or underdosed ingredients should score 50–70.
 - Return ONLY the JSON object, no markdown, no extra text.`;
 
-  // We don't know ingredient names yet (they're in the image),
-  // so inject the full stability knowledge base as context for the vision pass.
-  // The AI will cross-reference it when it reads the label.
-  const allIngredientNames = [
-    "ghk-cu", "ghk cu", "copper peptide", "nmn", "nicotinamide mononucleotide",
-    "glutathione", "bpc-157", "bpc157", "coq10", "ubiquinol", "omega-3", "fish oil",
-    "vitamin c", "ascorbic acid", "magnesium", "probiotics", "collagen"
-  ];
-  // Inject all known stability data as reference context
-  const allIngredients = findRelevantIngredients(allIngredientNames.join(" "), 10);
-  const stabilityContext = formatStabilityContext(allIngredients);
-  const finalSystemPrompt = systemPrompt + (stabilityContext || "");
-
   const requestBody = JSON.stringify({
     model: "gpt-4o",
     messages: [
-      { role: "system", content: finalSystemPrompt },
+      { role: "system", content: systemPrompt },
       {
         role: "user",
         content: [
