@@ -369,16 +369,24 @@ main {
 <script>
 // ── Click tracking ───────────────────────────────────────────
 function logClick(productName, affiliateLink) {
-  fetch('/.netlify/functions/log_click', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: lastQuery,
-      product_name: productName,
-      platform: 'Amazon',
-      affiliate_link: affiliateLink
-    })
-  }).catch(err => console.error('Click log error:', err));
+  // Use sendBeacon so the request survives page navigation
+  const payload = JSON.stringify({
+    query: lastQuery,
+    product_name: productName,
+    platform: 'Amazon',
+    affiliate_link: affiliateLink
+  });
+  try {
+    navigator.sendBeacon('/.netlify/functions/log_click', new Blob([payload], { type: 'application/json' }));
+  } catch (e) {
+    // Fallback to keepalive fetch if sendBeacon not available
+    fetch('/.netlify/functions/log_click', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true
+    }).catch(() => {});
+  }
 }
 
 // ── Reset to search ──────────────────────────────────────────
