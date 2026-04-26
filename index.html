@@ -1020,6 +1020,73 @@ function renderLabelResult(d) {
   </div>`;
 }
 
+// ── PWA: iOS detection ───────────────────────────────────────
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function isInStandaloneMode() {
+  return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+}
+
+function showIOSGuide() {
+  const existing = document.getElementById('ios-guide-overlay');
+  if (existing) { existing.remove(); return; }
+  const overlay = document.createElement('div');
+  overlay.id = 'ios-guide-overlay';
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
+    display:flex;align-items:flex-end;justify-content:center;
+    padding:0 16px 16px;
+  `;
+  overlay.innerHTML = `
+    <div style="
+      background:#1a1a2e;border:1px solid rgba(74,158,255,0.3);
+      border-radius:20px;padding:24px 22px;width:100%;max-width:480px;
+      box-shadow:0 -8px 40px rgba(0,0,0,0.5);
+    ">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <span style="font-size:1.6rem;">📱</span>
+        <div>
+          <div style="font-size:1rem;font-weight:800;color:#fff;">Add PickScope to Home Screen</div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:2px;">3 quick steps in Safari</div>
+        </div>
+        <button onclick="document.getElementById('ios-guide-overlay').remove()"
+          style="margin-left:auto;background:rgba(255,255,255,0.08);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.05);border-radius:12px;padding:12px 14px;">
+          <div style="width:32px;height:32px;background:rgba(74,158,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">1</div>
+          <div>
+            <div style="font-size:0.88rem;font-weight:700;color:#fff;">Tap the Share button</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:2px;">The <strong style="color:rgba(74,158,255,0.9);">⎙ Share</strong> icon at the bottom of your Safari browser</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.05);border-radius:12px;padding:12px 14px;">
+          <div style="width:32px;height:32px;background:rgba(74,158,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">2</div>
+          <div>
+            <div style="font-size:0.88rem;font-weight:700;color:#fff;">Scroll down and tap <span style="color:rgba(74,158,255,0.9);">"Add to Home Screen"</span></div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:2px;">You may need to scroll down in the share menu to find it</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.05);border-radius:12px;padding:12px 14px;">
+          <div style="width:32px;height:32px;background:rgba(74,158,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">3</div>
+          <div>
+            <div style="font-size:0.88rem;font-weight:700;color:#fff;">Tap <span style="color:rgba(74,158,255,0.9);">"Add"</span> in the top right</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:2px;">PickScope will appear on your home screen like a native app</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;text-align:center;font-size:0.75rem;color:rgba(255,255,255,0.3);">
+        Only available in Safari · Chrome on iOS does not support this
+      </div>
+    </div>
+  `;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
 // ── PWA: Service Worker + Install Prompt ─────────────────────
 let deferredInstallPrompt = null;
 const pwaBanner    = document.getElementById('pwa-banner');
@@ -1031,18 +1098,27 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
 
-// Capture install prompt
+// Capture install prompt (Android/Chrome)
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  // Show banner after 4 seconds if user hasn't dismissed before
   if (!sessionStorage.getItem('pwa-dismissed')) {
     setTimeout(() => pwaBanner.classList.add('show'), 4000);
   }
 });
 
+// iOS: show banner after 4s if not already installed and not dismissed
+if (isIOS() && !isInStandaloneMode() && !sessionStorage.getItem('pwa-dismissed')) {
+  setTimeout(() => pwaBanner.classList.add('show'), 4000);
+}
+
 // Install button
 pwaInstallBtn.addEventListener('click', async () => {
+  if (isIOS()) {
+    pwaBanner.classList.remove('show');
+    showIOSGuide();
+    return;
+  }
   if (!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
   const { outcome } = await deferredInstallPrompt.userChoice;
@@ -1065,7 +1141,8 @@ window.addEventListener('appinstalled', () => {
 
 // ── PWA: Inline install nudge in search results ───────────────
 function pwaInstallNudge() {
-  if (!deferredInstallPrompt) return '';
+  if (!deferredInstallPrompt && !isIOS()) return '';
+  if (isInStandaloneMode()) return '';
   return `
     <div onclick="triggerPwaInstall()" style="
       margin-top: 20px; padding: 14px 18px;
@@ -1085,6 +1162,7 @@ function pwaInstallNudge() {
 }
 
 function triggerPwaInstall() {
+  if (isIOS()) { showIOSGuide(); return; }
   if (!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
   deferredInstallPrompt.userChoice.then(({ outcome }) => {
