@@ -246,19 +246,19 @@ main {
 .retry-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── LABEL ANALYZER ── */
-#tab-label { padding-top: 32px; }
+#tab-label { padding-top: 24px; }
 .drop-zone {
   border: 2px dashed var(--border); border-radius: var(--radius);
-  padding: 52px 28px; text-align: center; cursor: pointer;
+  padding: 24px 20px; text-align: center; cursor: pointer;
   transition: all 0.2s; background: var(--bg2);
+  display: flex; align-items: center; gap: 16px; justify-content: center;
 }
 .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(74,158,255,0.04); }
-.drop-zone .dz-icon { font-size: 2.4rem; margin-bottom: 14px; }
-.drop-zone h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-.drop-zone .dz-sub { color: var(--text2); font-size: 0.84rem; }
+.drop-zone .dz-icon { font-size: 1.8rem; margin-bottom: 0; flex-shrink: 0; }
+.drop-zone h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+.drop-zone .dz-sub { color: var(--text2); font-size: 0.8rem; }
 .drop-zone .dz-tip {
-  margin-top: 14px; color: var(--text3); font-size: 0.77rem; line-height: 1.6;
-  background: var(--bg3); border-radius: 8px; padding: 10px 16px; display: inline-block;
+  margin-top: 4px; color: var(--text3); font-size: 0.73rem; line-height: 1.5;
 }
 #label-file-input { display: none; }
 .label-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
@@ -345,21 +345,30 @@ main {
 
   <!-- TAB 2: Label Analyzer -->
   <div class="tab-panel" id="tab-label">
+    <!-- Upload zone: compact horizontal -->
     <div class="drop-zone" id="drop-zone">
       <div class="dz-icon">📷</div>
-      <h3>Upload Supplement Label</h3>
-      <p class="dz-sub">Drag &amp; drop images here, or click to browse</p>
-      <div class="dz-tip">
-        ⚠️ Upload up to <strong>4 photos</strong> of the same product label<br>
-        Do <strong>not</strong> mix photos from different products in one upload
+      <div style="text-align:left;">
+        <h3>Upload Supplement Label</h3>
+        <p class="dz-sub">Tap to browse · up to 4 photos</p>
+        <div class="dz-tip">⚠️ Same product only — don't mix different products</div>
       </div>
       <input type="file" id="label-file-input" accept="image/*" multiple>
     </div>
+
+    <!-- Photo previews -->
     <div class="label-preview" id="label-preview"></div>
-    <div style="margin-top:12px;">
-      <textarea id="label-note" placeholder="(Optional) Ask anything — upload a label above, or just type a question: e.g. Is 500mg of magnesium oxide too high?" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:0.88rem;padding:12px 14px;resize:vertical;min-height:68px;line-height:1.6;outline:none;font-family:inherit;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-      <div style="font-size:0.75rem;color:var(--text3);margin-top:6px;">Sabe escribir en español · 日本語でも入力できます · 可以用中文输入 · 한국어로도 입력 가능 · Input in any language</div>
+
+    <!-- Question input: large card like AI Recommender -->
+    <div class="search-box" style="margin-top:16px;">
+      <textarea id="label-note" rows="4"
+        placeholder="Ask anything about a supplement label — or just type a question without uploading. e.g. Is 500mg magnesium oxide too high? Can I stack GHK-Cu with Vitamin C?"
+        style="width:100%;background:transparent;border:none;color:var(--text);font-size:0.93rem;padding:0;resize:none;outline:none;font-family:inherit;line-height:1.6;"></textarea>
+      <div class="lang-hint">
+        Sabe escribir en español · 日本語でも入力できます · 可以用中文输入 · 한국어로도 입력 가능 · Input in any language
+      </div>
     </div>
+
     <button class="analyze-label-btn" id="analyze-label-btn" style="display:none">Analyze Label</button>
     <div id="label-result-area"></div>
   </div>
