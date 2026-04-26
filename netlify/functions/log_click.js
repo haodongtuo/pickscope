@@ -13,11 +13,17 @@ exports.handler = async function (event) {
   if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "" };
   if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
 
+  console.log("log_click called, method:", event.httpMethod, "body:", event.body);
   let query, product_name, platform, affiliate_link;
   try {
-    ({ query, product_name, platform, affiliate_link } = JSON.parse(event.body));
+    ({ query, product_name, platform, affiliate_link } = JSON.parse(event.body || "{}"));
   } catch (e) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid request body" }) };
+    console.log("parse error:", e.message, "raw body:", event.body);
+    // Try to extract data anyway
+    query = "parse_error";
+    product_name = "parse_error";
+    platform = "Amazon";
+    affiliate_link = "";
   }
 
   const payload = JSON.stringify({
