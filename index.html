@@ -423,7 +423,9 @@ main {
 
 <script>
 // ── Click tracking ───────────────────────────────────────────
-function logClick(productName, affiliateLink) {
+function logClick(el) {
+  const productName   = el.dataset.productName   || '';
+  const affiliateLink = el.dataset.affiliateLink || '';
   const payload = JSON.stringify({
     query: lastQuery,
     product_name: productName,
@@ -668,7 +670,9 @@ function renderCard(p) {
     </div>
 
     <a class="amazon-btn" href="${p.affiliate_link}" target="_blank" rel="noopener"
-      onclick="logClick(${JSON.stringify(p.name)}, ${JSON.stringify(p.affiliate_link)})">View on Amazon →</a>
+      data-product-name="${(p.name||'').replace(/"/g,'&quot;')}"
+      data-affiliate-link="${(p.affiliate_link||'').replace(/"/g,'&quot;')}"
+      onclick="logClick(this)">View on Amazon →</a>
   </div>`;
 }
 
