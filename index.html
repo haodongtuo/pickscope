@@ -874,10 +874,12 @@ function handleFiles(files) {
 }
 
 analyzeLabelBtn.addEventListener('click', async () => {
-  if (!labelFiles.length) return;
+  const hasImage = labelFiles.length > 0;
+  const hasText  = labelNote.value.trim().length > 0;
+  if (!hasImage && !hasText) return;
   analyzeLabelBtn.disabled = true;
   analyzeLabelBtn.textContent = 'Analyzing...';
-  labelResultArea.innerHTML = '<div style="color:var(--text2);padding:20px 0;">Analyzing label…</div>';
+  labelResultArea.innerHTML = '<div style="color:var(--text2);padding:20px 0;">' + (hasImage ? 'Analyzing label…' : 'Thinking…') + '</div>';
   try {
     const imagesBase64 = await Promise.all(labelFiles.map(fileToBase64));
     const userNote = labelNote.value.trim();
