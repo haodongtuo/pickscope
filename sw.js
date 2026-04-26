@@ -1,5 +1,5 @@
 // PickScope Service Worker v1
-const CACHE = 'pickscope-v1';
+const CACHE = 'pickscope-v3';
 
 self.addEventListener('install', e => {
   e.waitUntil(
