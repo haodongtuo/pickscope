@@ -816,13 +816,14 @@ const fileInput      = document.getElementById('label-file-input');
 const labelPreview   = document.getElementById('label-preview');
 const labelNote      = document.getElementById('label-note');
 
+const analyzeLabelBtn = document.getElementById('analyze-label-btn');
+
 function updateLabelBtn() {
   const hasImage = labelFiles.length > 0;
   const hasText  = labelNote.value.trim().length > 0;
   analyzeLabelBtn.style.display = (hasImage || hasText) ? 'block' : 'none';
   analyzeLabelBtn.textContent = hasImage ? 'Analyze Label' : 'Ask Question';
 }
-const analyzeLabelBtn = document.getElementById('analyze-label-btn');
 const labelResultArea = document.getElementById('label-result-area');
 let labelFiles = [];
 
@@ -893,7 +894,7 @@ analyzeLabelBtn.addEventListener('click', async () => {
     labelResultArea.innerHTML = renderError(err.message);
   } finally {
     analyzeLabelBtn.disabled = false;
-    analyzeLabelBtn.textContent = 'Analyze Label';
+    analyzeLabelBtn.textContent = labelFiles.length > 0 ? 'Analyze Label' : 'Ask Question';
   }
 });
 
