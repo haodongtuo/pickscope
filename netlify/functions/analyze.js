@@ -2,6 +2,9 @@ const https = require("https");
 const { findRelevantMechanisms, formatMechanismContext } = require("./mechanisms");
 const { findRelevantIngredients, formatStabilityContext } = require("./stability_ingredients");
 
+const SUPABASE_URL = "https://mymezahwaaxunxaxqshe.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15bWV6YWh3YWF4dW54YXhxc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3NjAwNDMsImV4cCI6MjA4OTMzNjA0M30.PWQ4VucqevwqbzGIIGXwv99nupBTe8Bw0Hm7s-x-acU";
+
 function httpsPost(options, body) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
@@ -18,42 +21,195 @@ function httpsPost(options, body) {
   });
 }
 
-// Log search to Supabase search_logs table
-async function logSearch(originalQuery, aiKeyword, resultsCount) {
-  try {
-    const SUPABASE_URL = "https://mymezahwaaxunxaxqshe.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15bWV6YWh3YWF4dW54YXhxc2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3NjAwNDMsImV4cCI6MjA4OTMzNjA0M30.PWQ4VucqevwqbzGIIGXwv99nupBTe8Bw0Hm7s-x-acU";
-    const payload = JSON.stringify({
-      original_query: originalQuery,
-      ai_keyword: aiKeyword,
-      results_count: resultsCount
-    });
-    const url = new URL(`${SUPABASE_URL}/rest/v1/search_logs`);
+// ─── Supabase helper ───────────────────────────────────────────────────────
+async function supabaseRequest(path, method, payload) {
+  return new Promise((resolve) => {
+    const body = payload ? JSON.stringify(payload) : null;
     const options = {
-      hostname: url.hostname,
-      path: url.pathname,
-      method: "POST",
+      hostname: "mymezahwaaxunxaxqshe.supabase.co",
+      path,
+      method,
       headers: {
         "Content-Type": "application/json",
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${SUPABASE_KEY}`,
         "Prefer": "return=minimal",
-        "Content-Length": Buffer.byteLength(payload),
+        ...(body ? { "Content-Length": Buffer.byteLength(body) } : {}),
       },
     };
-    await new Promise((resolve, reject) => {
-      const req = https.request(options, (res) => {
-        res.on("data", () => {});
-        res.on("end", resolve);
+    const req = https.request(options, (res) => {
+      let data = "";
+      res.on("data", (c) => { data += c; });
+      res.on("end", () => {
+        try { resolve({ status: res.statusCode, body: data ? JSON.parse(data) : null }); }
+        catch { resolve({ status: res.statusCode, body: data }); }
       });
-      req.on("error", reject);
-      req.write(payload);
-      req.end();
+    });
+    req.on("error", (e) => resolve({ status: 0, error: e.message }));
+    if (body) req.write(body);
+    req.end();
+  });
+}
+
+// ─── Log search ────────────────────────────────────────────────────────────
+async function logSearch(originalQuery, aiKeyword, resultsCount) {
+  try {
+    await supabaseRequest("/rest/v1/search_logs", "POST", {
+      original_query: originalQuery,
+      ai_keyword: aiKeyword,
+      results_count: resultsCount,
     });
   } catch (err) {
-    // Non-fatal: don't let logging failure break the main response
     console.error("Supabase log error:", err.message);
   }
+}
+
+// ─── Query cache: check ────────────────────────────────────────────────────
+async function getCachedResult(normalizedQuery) {
+  try {
+    const encoded = encodeURIComponent(normalizedQuery);
+    const r = await supabaseRequest(
+      `/rest/v1/query_cache?query_normalized=eq.${encoded}&select=id,result&limit=1`,
+      "GET", null
+    );
+    if (r.status === 200 && Array.isArray(r.body) && r.body.length > 0) {
+      const row = r.body[0];
+      // bump hit_count + last_accessed in background (non-blocking)
+      supabaseRequest(
+        `/rest/v1/query_cache?id=eq.${row.id}`,
+        "PATCH",
+        { hit_count: (row.hit_count || 0) + 1, last_accessed: new Date().toISOString() }
+      ).catch(() => {});
+      return row.result;
+    }
+  } catch (err) {
+    console.error("Cache read error:", err.message);
+  }
+  return null;
+}
+
+// ─── Query cache: write ────────────────────────────────────────────────────
+async function saveCachedResult(originalQuery, normalizedQuery, result) {
+  try {
+    await supabaseRequest("/rest/v1/query_cache", "POST", {
+      query_normalized: normalizedQuery,
+      original_query: originalQuery,
+      result,
+      hit_count: 0,
+    });
+  } catch (err) {
+    console.error("Cache write error:", err.message);
+  }
+}
+
+// ─── Self-learning: extract & store ingredient knowledge ───────────────────
+async function learnFromResult(parsed) {
+  try {
+    const stability = parsed.stability_audit;
+    const mechanism = parsed.mechanism_insight;
+
+    // Collect all ingredient names mentioned in stability findings
+    const findings = (stability?.findings || []);
+    const warnings = (stability?.interaction_warnings || []);
+    const ingredientNames = new Set();
+    findings.forEach(f => f.ingredient && ingredientNames.add(f.ingredient));
+    warnings.forEach(w => (w.pair || []).forEach(p => ingredientNames.add(p)));
+
+    for (const name of ingredientNames) {
+      if (!name || name.length < 2) continue;
+      const nameLower = name.toLowerCase().trim();
+
+      // Build the knowledge payload for this ingredient
+      const ingredientFindings = findings.filter(f =>
+        f.ingredient && f.ingredient.toLowerCase() === nameLower
+      );
+      const ingredientWarnings = warnings.filter(w =>
+        (w.pair || []).some(p => p.toLowerCase() === nameLower)
+      );
+      const mechanismArr = mechanism?.mechanism_name
+        ? [{ name: mechanism.mechanism_name, relevance: mechanism.why_it_matters || "" }]
+        : [];
+
+      const payload = {
+        ingredient_name: name,
+        ingredient_name_lower: nameLower,
+        stability_findings: ingredientFindings.length > 0 ? ingredientFindings[0] : {},
+        interaction_warnings: ingredientWarnings,
+        mechanisms: mechanismArr,
+        last_updated: new Date().toISOString(),
+      };
+
+      // Upsert: insert if new, update if exists
+      await supabaseRequest(
+        "/rest/v1/learned_ingredients",
+        "POST",
+        payload
+      ).then(async (r) => {
+        if (r.status === 409) {
+          // Already exists — update knowledge + increment query_count
+          const enc = encodeURIComponent(nameLower);
+          await supabaseRequest(
+            `/rest/v1/learned_ingredients?ingredient_name_lower=eq.${enc}`,
+            "PATCH",
+            {
+              stability_findings: payload.stability_findings,
+              interaction_warnings: payload.interaction_warnings,
+              mechanisms: mechanismArr,
+              last_updated: payload.last_updated,
+              query_count: null, // will use raw SQL increment below
+            }
+          );
+        }
+      }).catch(() => {});
+    }
+  } catch (err) {
+    console.error("learnFromResult error:", err.message);
+  }
+}
+
+// ─── Self-learning: fetch ingredient context from DB ───────────────────────
+async function fetchLearnedContext(query) {
+  try {
+    // Extract potential ingredient names from query (basic word extraction)
+    const words = query.replace(/[^\w\s-]/g, " ").split(/\s+/).filter(w => w.length > 3);
+    if (words.length === 0) return "";
+
+    // Search for any known ingredients that appear in the query
+    const filters = words.slice(0, 5).map(w =>
+      `ingredient_name_lower=ilike.%${encodeURIComponent(w.toLowerCase())}%`
+    ).join(",");
+
+    const r = await supabaseRequest(
+      `/rest/v1/learned_ingredients?or=(${filters})&select=ingredient_name,stability_findings,interaction_warnings,mechanisms,query_count&limit=5`,
+      "GET", null
+    );
+
+    if (r.status === 200 && Array.isArray(r.body) && r.body.length > 0) {
+      let ctx = "\n\n## 📚 PickScope Learned Knowledge Base (from past analyses)\n";
+      ctx += "The following knowledge was accumulated from previous user queries. Use it to enhance your analysis:\n";
+      for (const row of r.body) {
+        ctx += `\n### ${row.ingredient_name} (seen ${row.query_count} times)\n`;
+        if (row.stability_findings && Object.keys(row.stability_findings).length > 0) {
+          ctx += `- Stability: ${row.stability_findings.issue || ""} — ${row.stability_findings.detail || ""}\n`;
+        }
+        if (row.interaction_warnings && row.interaction_warnings.length > 0) {
+          ctx += `- Known interactions: ${row.interaction_warnings.map(w => (w.pair || []).join(" + ")).join("; ")}\n`;
+        }
+        if (row.mechanisms && row.mechanisms.length > 0) {
+          ctx += `- Mechanisms: ${row.mechanisms.map(m => m.name).join(", ")}\n`;
+        }
+      }
+      return ctx;
+    }
+  } catch (err) {
+    console.error("fetchLearnedContext error:", err.message);
+  }
+  return "";
+}
+
+// ─── Normalize query for cache key ─────────────────────────────────────────
+function normalizeQuery(query) {
+  return query.toLowerCase().trim().replace(/\s+/g, " ").substring(0, 300);
 }
 
 exports.handler = async function (event) {
@@ -81,6 +237,16 @@ exports.handler = async function (event) {
   const apiKey = process.env.VITE_OPENAI_API_KEY;
   if (!apiKey) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: "API key not configured" }) };
+  }
+
+  // ── Cache check: same query? return instantly ──────────────────────────
+  const normalizedQuery = normalizeQuery(query);
+  const cached = await getCachedResult(normalizedQuery);
+  if (cached) {
+    console.log("Cache HIT for:", normalizedQuery.substring(0, 60));
+    // Mark as cached in response so frontend can show "⚡ Instant result"
+    cached._cached = true;
+    return { statusCode: 200, headers, body: JSON.stringify(cached) };
   }
 
   const systemPrompt = `You are PickScope, an advanced AI supplement scientist and analyst.
@@ -267,9 +433,13 @@ IMPORTANT for mechanism_insight: If the user mentions something they have alread
   const relevantIngredients = findRelevantIngredients(query, 3);
   const stabilityContext = formatStabilityContext(relevantIngredients);
 
+  // Self-learning: inject accumulated knowledge from past queries
+  const learnedContext = await fetchLearnedContext(query);
+
   const finalSystemPrompt = systemPrompt
     + (mechanismContext || "")
-    + (stabilityContext || "");
+    + (stabilityContext || "")
+    + (learnedContext || "");
 
   const requestBody = JSON.stringify({
     model: "gpt-4o",
@@ -305,10 +475,16 @@ IMPORTANT for mechanism_insight: If the user mentions something they have alread
     }
     const parsed = JSON.parse(content);
 
-    // Log to Supabase (awaited so it completes before Lambda shuts down)
+    // Log + self-learn + cache (all non-blocking except logSearch)
     const products = parsed.products || [];
     const aiKeyword = products.length > 0 ? products[0].name : query;
     await logSearch(query, aiKeyword, products.length);
+
+    // Self-learning: extract ingredient knowledge from this result
+    learnFromResult(parsed).catch(() => {});
+
+    // Cache this result for future identical queries
+    saveCachedResult(query, normalizedQuery, parsed).catch(() => {});
 
     return { statusCode: 200, headers, body: JSON.stringify(parsed) };
   } catch (err) {
