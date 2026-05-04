@@ -207,6 +207,53 @@ async function fetchLearnedContext(query) {
   return "";
 }
 
+// ─── Exit Protocol context: inject real taper data when relevant ───────────
+async function fetchExitProtocolContext(query) {
+  try {
+    const q = query.toLowerCase();
+    // 触发关键词：涉及退出/下车/停药/减重维持/GLP-1 相关
+    const triggers = [
+      "stop", "taper", "exit", "off", "quit", "discontinue", "wean",
+      "rebound", "maintain", "after stopping", "cycle off", "come off",
+      "glp-1", "glp1", "semaglutide", "tirzepatide", "retatrutide", "ozempic", "wegovy", "mounjaro",
+      "weight loss maintenance", "keep weight off", "lifetime dependency",
+      "下车", "停药", "退出", "减量", "维持", "反弹", "停针", "依赖"
+    ];
+    const isRelevant = triggers.some(t => q.includes(t));
+    if (!isRelevant) return "";
+
+    const r = await supabaseRequest(
+      `/rest/v1/exit_protocols?select=substance,substance_category,peak_dose,duration_of_use,taper_steps,outcome,maintained_loss,maintenance_strategy,tags,ai_summary,evidence_quality&outcome=eq.success&order=created_at.desc&limit=5`,
+      "GET", null
+    );
+
+    if (r.status === 200 && Array.isArray(r.body) && r.body.length > 0) {
+      let ctx = "\n\n## 💉 Real-World Exit Protocol Database (PickScope verified cases)\n";
+      ctx += "The following are REAL documented cases of users successfully tapering off GLP-1/peptide medications without rebound. Use these as concrete evidence when the user asks about stopping, tapering, or post-medication maintenance:\n";
+      for (const row of r.body) {
+        ctx += `\n### Case: ${row.substance} (${row.substance_category})\n`;
+        ctx += `- Peak dose: ${row.peak_dose} | Duration: ${row.duration_of_use}\n`;
+        ctx += `- Outcome: ${row.outcome} | Maintained loss: ${row.maintained_loss}\n`;
+        ctx += `- Maintenance strategy: ${row.maintenance_strategy}\n`;
+        ctx += `- Summary: ${row.ai_summary}\n`;
+        if (Array.isArray(row.taper_steps)) {
+          ctx += `- Taper protocol:\n`;
+          row.taper_steps.forEach(step => {
+            ctx += `  Phase ${step.phase}: ${step.dose} every ${step.interval_days} days — ${step.notes}\n`;
+          });
+        }
+        ctx += `- Evidence quality: ${row.evidence_quality}\n`;
+        ctx += `- Tags: ${(row.tags || []).join(", ")}\n`;
+      }
+      ctx += "\nIMPORTANT: When referencing these cases, always note they are real-world self-reported user experiences (not clinical trials) and individual results may vary. Frame them as 'documented community successes' not medical advice.\n";
+      return ctx;
+    }
+  } catch (err) {
+    console.error("fetchExitProtocolContext error:", err.message);
+  }
+  return "";
+}
+
 // ─── Normalize query for cache key ─────────────────────────────────────────
 function normalizeQuery(query) {
   return query.toLowerCase().trim().replace(/\s+/g, " ").substring(0, 300);
@@ -436,10 +483,14 @@ IMPORTANT for mechanism_insight: If the user mentions something they have alread
   // Self-learning: inject accumulated knowledge from past queries
   const learnedContext = await fetchLearnedContext(query);
 
+  // Exit protocol database: inject real taper cases when query is relevant
+  const exitProtocolContext = await fetchExitProtocolContext(query);
+
   const finalSystemPrompt = systemPrompt
     + (mechanismContext || "")
     + (stabilityContext || "")
-    + (learnedContext || "");
+    + (learnedContext || "")
+    + (exitProtocolContext || "");
 
   const requestBody = JSON.stringify({
     model: "gpt-4o",
