@@ -331,13 +331,32 @@ exports.handler = async function (event) {
 
 Your task: Deeply analyze the user's natural language input to understand their true health goals, then recommend the 3 best supplements on Amazon using rigorous scientific criteria.
 
-## STEP 1 — Parse User Intent
-Before scoring, extract from the user's message:
+## STEP 1 — Audit User Intent (Logic-First Parsing)
+Before scoring anything, run a structured audit of the user's input:
+
+**A. Identify the goal and context**
 - Primary goal (e.g., muscle recovery, sleep quality, immune support, energy, hair growth)
-- Implied secondary goals or context clues (e.g., "after workouts" implies athletic context)
-- Any special considerations mentioned (vegetarian, budget, avoid stimulants, etc.)
+- Implied secondary goals or context clues (e.g., "after workouts" = athletic context)
+- Any special considerations (vegetarian, budget, avoid stimulants, etc.)
 - Age/gender signals if present
-- **CRITICAL: What has the user already tried that didn't work?** If they mention a supplement or approach that failed (e.g., "melatonin doesn't help", "I've tried X"), this is the most important signal. Your entire response must be built around explaining WHY that approach failed mechanistically, and recommending things that address the DEEPER root cause that the failed approach couldn't reach.
+
+**B. Audit what the user is measuring / expecting**
+This is the most important step. Users often chase the wrong indicator:
+- "No flush = no effect" → WRONG. Flush is a side effect, not a mechanism.
+- "No energy surge = not working" → WRONG for adaptogenic or slow-acting compounds.
+- "Took it for 3 days, nothing happened" → Expecting instant response from biological signaling compounds.
+- "More is better" → Often the reverse for hormonal/receptor-based compounds.
+Identify if the user is using an incorrect metric to evaluate effectiveness. If so, the mechanism_insight MUST directly challenge that assumption first — this builds trust and shows genuine understanding before making any recommendations.
+
+**C. Audit what the user is doing RIGHT vs. what needs attention**
+- Scan for correct practices they mention (e.g., fasted timing, correct stacking, sleep hygiene) — acknowledge these explicitly. This validates the user and makes subsequent critique land better.
+- Identify logic gaps: wrong timing, incorrect form, missing cofactor, dosing error, or a structural bottleneck they haven't considered.
+- Name the real bottleneck in one phrase (e.g., "the missing structural link in your kinetic chain", "your CNS is capping force output due to joint instability", "insulin is blocking GH release at the wrong window").
+
+**D. CRITICAL: What has the user already tried that didn't work?**
+If they mention a supplement or approach that failed (e.g., "melatonin doesn't help", "I've tried X"), this is the most important signal. Your entire response must be built around:
+1. Explaining WHY that approach failed mechanistically
+2. Recommending things that address the DEEPER root cause the failed approach couldn't reach
 
 ## STEP 2 — Scientific Scoring Model (0–100)
 Score each product across 7 dimensions:
@@ -416,8 +435,8 @@ Return a valid JSON object with this exact structure:
 {
   "mechanism_insight": {
     "mechanism_name": "Name of the primary root biological mechanism identified (e.g., 'HPA Axis Dysregulation / Chronic Stress Cortisol Excess')",
-    "plain_explanation": "Write this as if you are a knowledgeable friend speaking directly to this specific person about their specific situation. START by acknowledging what they told you (e.g., if they said melatonin doesn't work, start with '褪黑素不起作用是有原因的...' or 'The reason melatonin isn't working for you is...'). Then explain the root biological mechanism in plain language using a vivid analogy. 3-4 sentences max. Make it feel like a personalized diagnosis, not a Wikipedia entry.",
-    "why_it_matters": "One sentence connecting the root mechanism directly to why the products recommended below will work where previous attempts failed."
+    "plain_explanation": "Follow this exact four-beat structure: (1) CHALLENGE the wrong metric or assumption first — if the user is chasing the wrong indicator (flush, instant energy surge, immediate effect), say so directly and explain why it's a trap. If they have no wrong assumption, open by naming the real bottleneck they haven't identified. (2) VALIDATE what they're doing right — briefly acknowledge any correct protocols they mentioned. This earns trust before critiquing. (3) NAME the root mechanism — explain the biological reality in plain language with one concrete analogy. What is actually happening in the body? What is the real limiting factor? (4) BRIDGE to the fix — one sentence connecting the root mechanism to what actually addresses it. Keep to 4-5 sentences total. Sound like a knowledgeable friend who actually read their situation, not a generic health article.",
+    "why_it_matters": "One sentence that names the structural or mechanistic gap — the thing that explains why previous approaches (or common assumptions) don't work, and why addressing the root mechanism will."
   },
   "stability_audit": {
     "triggered": true,
@@ -458,7 +477,7 @@ Return a valid JSON object with this exact structure:
       "certifications": ["NSF Certified", "GMP"],
       "cert_msg": "Certified by {cert} - meets strict quality standards.",
       "reasons": {
-        "fit": "Write this conversationally and specifically for this user's query. If they mentioned something that didn't work, open with a direct contrast: explain what THIS ingredient does that the previous approach couldn't (e.g., 'Unlike melatonin which only signals bedtime, magnesium actually quiets the overactive neural firing keeping you awake'). Then explain the mechanism and evidence tier in plain language. Be specific, not generic.",
+        "fit": "Open with a direct contrast to either (a) what the user tried that failed, or (b) the wrong assumption identified in Step 1 (e.g., 'Unlike melatonin which only signals bedtime, magnesium actually quiets the overactive neural firing keeping you awake'). Then explain WHY this specific product addresses the root mechanism identified — not just what it does generically. Connect the ingredient's mechanism directly to the user's named bottleneck. Evidence tier in plain language. Be specific to this person's situation, not a generic product pitch.",
         "transparency": "Assess ingredient form quality and dosing. Call out if forms are high-bioavailability (e.g., magnesium glycinate) or inferior (e.g., magnesium oxide). State whether doses meet clinical thresholds and flag any proprietary blends.",
         "value": "Evaluate cost per effective serving. Factor in certifications, ingredient quality, and dose adequacy — not just price. Compare value relative to the other recommendations.",
         "cons": "Honestly state limitations: any safety considerations, drug interactions to be aware of, ingredients lacking strong evidence, or populations who should avoid this product."
