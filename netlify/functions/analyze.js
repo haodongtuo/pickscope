@@ -207,6 +207,37 @@ async function fetchLearnedContext(query) {
   return "";
 }
 
+// ─── Exit Protocol: auto-save user-reported taper experience ──────────────
+async function saveUserExitData(exitData) {
+  if (!exitData || !exitData.substance || !exitData.taper_steps) return;
+  try {
+    const payload = {
+      substance: exitData.substance,
+      substance_category: exitData.substance_category || 'unknown',
+      peak_dose: exitData.peak_dose || null,
+      duration_of_use: exitData.duration_of_use || null,
+      taper_steps: exitData.taper_steps,
+      outcome: exitData.outcome || 'unknown',
+      maintained_loss: exitData.maintained_loss ?? null,
+      maintenance_strategy: exitData.maintenance_strategy || null,
+      starting_weight_lbs: exitData.starting_weight_lbs || null,
+      ending_weight_lbs: exitData.ending_weight_lbs || null,
+      tags: exitData.tags || [],
+      source_platform: 'user_query',
+      evidence_quality: 'self_reported_tracked',
+      ai_summary: `User-reported via PickScope query. Substance: ${exitData.substance}, outcome: ${exitData.outcome}.`,
+    };
+    const r = await supabaseRequest('/rest/v1/exit_protocols', 'POST', payload);
+    if (r.status === 201) {
+      console.log('✅ User exit data saved to exit_protocols');
+    } else {
+      console.error('Exit data save failed:', r.status, JSON.stringify(r.body));
+    }
+  } catch (err) {
+    console.error('saveUserExitData error:', err.message);
+  }
+}
+
 // ─── Exit Protocol context: inject real taper data when relevant ───────────
 async function fetchExitProtocolContext(query) {
   try {
@@ -441,12 +472,33 @@ Return a valid JSON object with this exact structure:
       "pmid": "12345678",
       "link": "https://pubmed.ncbi.nlm.nih.gov/12345678/"
     }
-  ]
+  ],
+  "user_exit_data": null
 }
 
 CRITICAL: The "mechanism_insight" field is MANDATORY and must always be present as the first field in the JSON. Identify the most relevant root biological mechanism for the user's query even if no mechanism knowledge base context is provided.
 
 IMPORTANT for mechanism_insight: If the user mentions something they have already tried that didn't work (e.g., "melatonin doesn't work", "I've tried magnesium"), your plain_explanation MUST explicitly explain WHY that approach didn't work at a mechanistic level, and how the root mechanism explains the failure. This is the key insight that makes PickScope valuable — not just recommending alternatives, but explaining the ROOT REASON why the previous approach failed.
+
+## STEP 4 — Exit Protocol Extraction (Optional, only if applicable)
+If the user's query describes their OWN personal experience stopping, tapering, or cycling off a GLP-1, peptide, or weight-loss medication, extract that experience into a structured `user_exit_data` field. This feeds PickScope's real-world exit protocol database.
+
+Only populate `user_exit_data` if the user is clearly describing THEIR OWN past or current taper experience (not asking hypothetically). If not applicable, set `user_exit_data` to null.
+
+`user_exit_data` structure:
+{
+  "substance": "name of medication/peptide",
+  "substance_category": "GLP-1 | peptide | other",
+  "peak_dose": "highest dose used e.g. 2mg",
+  "duration_of_use": "e.g. 3 months",
+  "taper_steps": [ { "phase": 1, "dose": "...", "interval_days": 0, "notes": "..." } ],
+  "outcome": "success | partial | rebound | ongoing | unknown",
+  "maintained_loss": true | false | null,
+  "maintenance_strategy": "what they are doing to maintain results",
+  "starting_weight_lbs": null or number,
+  "ending_weight_lbs": null or number,
+  "tags": ["relevant tags from the experience"]
+}
 
 ## Rules
 - **Language matching**: Detect the language of the user's query and respond in that same language. If the user writes in Chinese, all product names (where possible), reasons, and descriptions must be in Chinese. If Spanish, respond in Spanish. If Japanese, respond in Japanese. Only the JSON keys remain in English.
@@ -533,6 +585,11 @@ IMPORTANT for mechanism_insight: If the user mentions something they have alread
 
     // Self-learning: extract ingredient knowledge from this result
     learnFromResult(parsed).catch(() => {});
+
+    // Auto-save user-reported exit protocol if GPT detected one in the query
+    if (parsed.user_exit_data) {
+      saveUserExitData(parsed.user_exit_data).catch(() => {});
+    }
 
     // Cache this result for future identical queries
     saveCachedResult(query, normalizedQuery, parsed).catch(() => {});
