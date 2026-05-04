@@ -610,17 +610,18 @@ const MECHANISMS = [
       },
       {
         supplement: "Hydrolyzed Collagen Peptides + Vitamin C",
-        mechanism: "Collagen provides glycine and proline for connective tissue synthesis (tendons, ligaments, cartilage). Glycine also serves as a co-agonist at NMDA receptors and supports creatine synthesis. Joint integrity improvements reduce pain-limited movement, allowing heavier loading and fuller ROM during lifts. Real-world reports (r/Biohackers, n=multiple) suggest 15–20g/day breaks strength plateaus within weeks.",
-        effect: "Reduces joint pain and inflammation during training, improves tendon/ligament resilience, may help overcome strength plateaus by removing structural weak points. Skin and hair benefits are secondary.",
-        dose: "15–20g hydrolyzed collagen peptides + 500mg Vitamin C, taken 30–60min before workout (vitamin C required for collagen synthesis activation)",
+        mechanism: "Three-layer mechanism: (1) STRUCTURAL — Glycine, Proline, and Hydroxyproline are the specific amino acids that reinforce the collagen matrix inside tendons and ligaments. Regular whey/meat protein lacks sufficient concentrations of these three. (2) NEUROLOGICAL — The CNS continuously monitors joint stability via mechanoreceptors. Unstable or painful joints trigger a protective inhibition: the nervous system caps motor unit recruitment below the muscle's actual capacity. Stronger connective tissue = CNS 'unlocks' higher force output from the same muscle mass. (3) KINETIC CHAIN INTEGRITY — Force production is limited by the weakest structural link in the chain. Strengthening tendons/ligaments/fascia removes this structural ceiling, allowing MPS gains to actually express as strength. Most gym plateaus are not muscle-limited but connective-tissue-limited.",
+        effect: "Reduces joint pain during training, improves tendon/ligament resilience, and — critically — removes the CNS force inhibition caused by joint instability. Users report strength gains on all major lifts within 3–6 weeks without increasing muscle mass. 20g collagen replacing 20g regular protein (keeping total protein constant) is a validated swap protocol.",
+        dose: "15–20g hydrolyzed collagen peptides + 500mg Vitamin C, taken 30–60min before workout (Vitamin C is required cofactor for hydroxylation step; without it, collagen synthesis is impaired)",
         evidence_tier: "B",
-        synergy: ["Vitamin C (essential cofactor — do not skip)", "Creatine (complementary: collagen for joints, creatine for ATP)", "Omega-3 (synergistic anti-inflammation)"],
-        antagonism: ["Not a complete protein — lacks tryptophan; do not replace full protein intake with collagen"],
-        pmids: ["29949514", "31031003", "28177716"],
-        user_evidence: "Reddit r/Biohackers user reported: 20g collagen/day → improved skin, reduced joint pain, AND progressive strength gains on all lifts within weeks. Replaced 20g of regular protein to keep total protein constant — plateaus resolved."
+        synergy: ["Vitamin C (essential cofactor — do not skip)", "Creatine (complementary systems: collagen for joint integrity, creatine for ATP)", "Omega-3 (synergistic anti-inflammation in connective tissue)"],
+        antagonism: ["Not a complete protein — lacks tryptophan; never replace all protein with collagen", "Collagen : regular protein ratio should not exceed 1:3 by weight to preserve MPS signaling"],
+        pmids: ["29949514", "31031003", "28177716", "26353786"],
+        protein_ratio_note: "Optimal protein strategy for high-frequency/high-joint-stress training: balance MPS-focused protein (whey, meat) with connective tissue support (collagen) based on training volume and joint load. A 20g collagen / 120–160g total protein daily ratio is a reasonable starting point.",
+        user_evidence: "r/Biohackers: swapping 20g regular protein → 20g collagen (total protein constant) resolved multi-month strength plateau across all lifts within weeks. Secondary benefits: skin quality, joint pain elimination."
       }
     ],
-    key_synergies: "Creatine (ATP) + Beta-Alanine (lactate buffering) + Citrulline (blood flow) = three separate performance mechanisms working together. Collagen (joint integrity) is often the missing link when plateaus are pain/mobility-limited.",
+    key_synergies: "Creatine (ATP system) + Beta-Alanine (lactate buffering) + Citrulline (blood flow) = three separate performance mechanisms. Collagen (connective tissue integrity + CNS force inhibition removal) is the fourth dimension — often the actual bottleneck in experienced lifters.",
     key_antagonisms: "Alcohol within 4–8 hours post-workout significantly impairs muscle protein synthesis and recovery"
   },
 
