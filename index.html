@@ -166,7 +166,7 @@ main {
 
 .lang-hint {
   font-size: 0.68rem;
-  color: #383838;
+  color: #707070;
   font-family: monospace;
   text-align: center;
   line-height: 1.6;
@@ -468,7 +468,10 @@ main {
     <div class="logo-text">Pick<span>Scope</span></div>
     <div class="tagline">Science-backed supplement recommendations</div>
   </a>
-  <div class="tabs" style="margin-top:24px;">
+  <nav style="margin-top:20px;">
+    <a href="/blog/" style="color:var(--text2);font-size:0.85rem;font-weight:600;text-decoration:none;padding:6px 14px;border:1px solid var(--border);border-radius:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">📝 Blog</a>
+  </nav>
+  <div class="tabs" style="margin-top:20px;">
     <button class="tab-btn active" data-tab="recommender">🔍 AI Recommender</button>
     <button class="tab-btn" data-tab="label">🏷️ Label Analyzer</button>
     <button class="tab-btn tab-pro" data-tab="stack">Stack Auditor <span class="pro-badge">BETA</span></button>
