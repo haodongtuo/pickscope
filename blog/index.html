@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>PickScope Blog — Supplement Safety, Science & Stack Guides</title>
+  <meta name="description" content="Evidence-based articles on supplement safety, dangerous supplement combinations, dosing, and how to build an effective, safe supplement stack. Powered by PickScope." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://pickscope.com/blog/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="PickScope Blog — Supplement Safety, Science & Stack Guides" />
+  <meta property="og:description" content="Evidence-based articles on supplement safety, dangerous supplement combinations, dosing, and how to build an effective, safe supplement stack." />
+  <meta property="og:url" content="https://pickscope.com/blog/" />
+  <meta property="og:site_name" content="PickScope" />
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://pickscope.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": "https://pickscope.com/blog/"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Blog Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "PickScope Blog",
+    "description": "Evidence-based supplement safety articles",
+    "url": "https://pickscope.com/blog/",
+    "publisher": {
+      "@type": "Organization",
+      "name": "PickScope",
+      "url": "https://pickscope.com"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --bg2: #1a1a1a;
+      --bg3: #242424;
+      --border: #2e2e2e;
+      --accent: #4A9EFF;
+      --green: #3ECF8E;
+      --orange: #FF9500;
+      --red: #FF4C4C;
+      --text: #f0f0f0;
+      --text2: #a0a0a0;
+      --radius: 12px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-tagline {
+      font-size: 12px;
+      color: var(--text2);
+      display: none;
+    }
+
+    @media (min-width: 600px) {
+      .logo-tagline { display: block; }
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    nav a {
+      color: var(--text2);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    nav a:hover {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+    }
+
+    .nav-cta:hover {
+      opacity: 0.9;
+    }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb-wrap {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+    }
+
+    .breadcrumb {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .breadcrumb a {
+      color: var(--text2);
+      transition: color 0.15s;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .breadcrumb-sep {
+      color: var(--border);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 64px 24px 48px;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(74, 158, 255, 0.12);
+      border: 1px solid rgba(74, 158, 255, 0.25);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text2);
+      line-height: 1.65;
+    }
+
+    /* ── Blog Grid ── */
+    .blog-section {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .section-heading {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text2);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Featured Article (large card) ── */
+    .featured-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    @media (min-width: 720px) {
+      .featured-card {
+        grid-template-columns: 1fr 420px;
+      }
+    }
+
+    .featured-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .featured-card-body {
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .featured-card-visual {
+      background: linear-gradient(135deg, #1a0a0a 0%, #2a1010 40%, #1a0a1a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-visual-inner {
+      text-align: center;
+      z-index: 1;
+    }
+
+    .featured-visual-emoji {
+      font-size: 72px;
+      display: block;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 30px rgba(255, 76, 76, 0.4));
+    }
+
+    .featured-visual-label {
+      font-size: 13px;
+      color: rgba(255, 76, 76, 0.7);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .visual-glow {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 76, 76, 0.15), transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .tag-danger {
+      background: rgba(255, 76, 76, 0.12);
+      color: var(--red);
+      border: 1px solid rgba(255, 76, 76, 0.25);
+    }
+
+    .tag-science {
+      background: rgba(74, 158, 255, 0.10);
+      color: var(--accent);
+      border: 1px solid rgba(74, 158, 255, 0.2);
+    }
+
+    .tag-featured {
+      background: rgba(62, 207, 142, 0.10);
+      color: var(--green);
+      border: 1px solid rgba(62, 207, 142, 0.2);
+    }
+
+    .featured-card-body h2 {
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+
+    .featured-card-body h2 a {
+      color: var(--text);
+    }
+
+    .featured-card-body h2 a:hover {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .card-excerpt {
+      color: var(--text2);
+      font-size: 15px;
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-meta {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .read-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+
+    .read-more-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    /* ── Regular article grid ── */
+    .article-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── Coming soon card ── */
+    .coming-soon-card {
+      background: var(--bg2);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0.6;
+    }
+
+    .coming-soon-card .cs-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(160, 160, 160, 0.1);
+      color: var(--text2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+
+    .coming-soon-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text2);
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .coming-soon-card p {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(74, 158, 255, 0.10), rgba(62, 207, 142, 0.07));
+      border: 1px solid rgba(74, 158, 255, 0.2);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      margin-top: 56px;
+    }
+
+    .cta-banner h2 {
+      font-size: clamp(20px, 3.5vw, 28px);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .cta-banner p {
+      color: var(--text2);
+      font-size: 15px;
+      max-width: 480px;
+      margin: 0 auto 24px;
+    }
+
+    .cta-btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: 10px;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+
+    .cta-btn-main:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    /* ── Newsletter ── */
+    .newsletter-strip {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 24px;
+      margin-top: 56px;
+    }
+
+    .newsletter-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .newsletter-copy h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .newsletter-copy p {
+      color: var(--text2);
+      font-size: 14px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .newsletter-input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      width: 240px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .newsletter-input::placeholder { color: var(--text2); }
+    .newsletter-input:focus { border-color: var(--accent); }
+
+    .newsletter-btn {
+      background: var(--green);
+      color: #000;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+
+    .newsletter-btn:hover { opacity: 0.85; }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    .footer-inner p {
+      color: var(--text2);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .footer-disclaimer {
+      font-size: 12px;
+      color: #555;
+      max-width: 600px;
+      margin: 12px auto 0;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .featured-card-body { padding: 24px; }
+      .cta-banner { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="header-inner">
+    <a href="https://pickscope.com" class="logo">
+      <div class="logo-icon">🔬</div>
+      <div>
+        <div class="logo-text">PickScope</div>
+        <div class="logo-tagline">Science-backed supplement recommendations</div>
+      </div>
+    </a>
+    <nav>
+      <a href="https://pickscope.com">Home</a>
+      <a href="https://pickscope.com/blog/" style="color: var(--text);">Blog</a>
+      <a href="https://pickscope.com" class="nav-cta">Check My Stack →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── Breadcrumb ── -->
+<div class="breadcrumb-wrap">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="https://pickscope.com">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <span style="color: var(--text);">Blog</span>
+  </nav>
+</div>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-badge">🔬 Evidence-Based · Peer-Reviewed Sources</div>
+  <h1>The PickScope Blog</h1>
+  <p>
+    Science-backed guides on supplement safety, dangerous interactions, effective stacking, and the research behind the headlines. No hype, no sponsored opinions.
+  </p>
+</div>
+
+<!-- ── Blog Content ── -->
+<div class="blog-section">
+
+  <div class="section-heading">Featured Article</div>
+
+  <!-- Featured Card: Dangerous Combinations -->
+  <article class="featured-card">
+    <div class="featured-card-body">
+      <div class="card-tags">
+        <span class="tag tag-featured">⭐ Featured</span>
+        <span class="tag tag-danger">⚠️ Safety Alert</span>
+        <span class="tag tag-science">🔬 Science-Backed</span>
+      </div>
+      <h2>
+        <a href="https://pickscope.com/blog/dangerous-supplement-combinations/">
+          5 Dangerous Supplement Combinations You Need to Stop Taking Right Now
+        </a>
+      </h2>
+      <p class="card-excerpt">
+        Millions of people stack supplements daily without realizing some combinations can trigger serotonin syndrome, cause dangerous bleeding, drive calcium toxicity, or push your heart into arrhythmia. We break down the five most dangerous pairings — with the science to back it up — and tell you exactly how to avoid them.
+      </p>
+      <div class="card-footer">
+        <span class="card-meta">📅 August 30, 2026 · ⏱ 8 min read · 🏷 Supplement Safety</span>
+        <a href="https://pickscope.com/blog/dangerous-supplement-combinations/" class="read-more-btn">
+          Read Article →
+        </a>
+      </div>
+    </div>
+    <div class="featured-card-visual">
+      <div class="visual-glow"></div>
+      <div class="featured-visual-inner">
+        <span class="featured-visual-emoji">⚗️</span>
+        <div class="featured-visual-label">Supplement Safety</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Coming Soon Articles -->
+  <div class="section-heading" style="margin-top: 40px;">Coming Soon</div>
+
+  <div class="article-grid">
+
+    <article class="coming-soon-card">
+      <span class="cs-tag">🕐 Coming Soon</span>
+      <h3>The Best Supplement Stack for Sleep (That Actually Works)</h3>
+      <p>Magnesium glycinate, L-theanine, glycine — what the research actually shows, and what dose to use.</p>
+    </article>
+
+    <article class="coming-soon-card">
+      <span class="cs-tag">🕐 Coming Soon</span>
+      <h3>Does Creatine Really Work? A Deep Dive Into 30 Years of Research</h3>
+      <p>The most studied supplement in sports nutrition, finally explained without gym-bro mythology.</p>
+    </article>
+
+    <article class="coming-soon-card">
+      <span class="cs-tag">🕐 Coming Soon</span>
+      <h3>Vitamin D Deficiency: Who Actually Needs to Supplement (and How Much)</h3>
+      <p>Blood test thresholds, optimal dosing, cofactors you must take with it, and who should avoid it.</p>
+    </article>
+
+    <article class="coming-soon-card">
+      <span class="cs-tag">🕐 Coming Soon</span>
+      <h3>The Omega-3 Buyer's Guide: Why Most Fish Oil Is Garbage</h3>
+      <p>Ethyl ester vs. triglyceride form, oxidation testing, EPA/DHA ratios, and brands worth trusting.</p>
+    </article>
+
+    <article class="coming-soon-card">
+      <span class="cs-tag">🕐 Coming Soon</span>
+      <h3>Protein Powder Safety: What's Really in Your Tub</h3>
+      <p>Heavy metals, nitrogen spiking, proprietary blends — and the third-party tested brands to trust.</p>
+    </article>
+
+    <article class="coming-soon-card">
+      <span class="cs-tag">🕐 Coming Soon</span>
+      <h3>Ashwagandha: What the Research Says (And What It Doesn't)</h3>
+      <p>Cortisol, testosterone, anxiety — separating real clinical data from marketing claims.</p>
+    </article>
+
+  </div>
+
+  <!-- CTA Banner -->
+  <div class="cta-banner">
+    <h2>🔬 Don't Just Read — Check Your Stack</h2>
+    <p>PickScope's AI safety engine instantly flags dangerous interactions, redundant nutrients, and dosing issues in your personal supplement stack.</p>
+    <a href="https://pickscope.com" class="cta-btn-main">
+      ✅ Check My Stack for Free
+    </a>
+  </div>
+
+</div>
+
+<!-- ── Newsletter Strip ── -->
+<div class="newsletter-strip">
+  <div class="newsletter-inner">
+    <div class="newsletter-copy">
+      <h3>📬 Get New Articles in Your Inbox</h3>
+      <p>Science-backed supplement research, delivered monthly. No spam, ever.</p>
+    </div>
+    <div class="newsletter-form">
+      <input type="email" class="newsletter-input" placeholder="your@email.com" />
+      <button class="newsletter-btn">Subscribe →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-inner">
+    <p><a href="https://pickscope.com" style="color: var(--accent); font-weight: 600;">PickScope</a> — Science-backed supplement recommendations</p>
+    <p style="color: #555;">© 2026 PickScope. All rights reserved.</p>
+    <p class="footer-disclaimer">
+      The information on this site is for educational purposes only and does not constitute medical advice. Always consult a qualified healthcare professional before starting or changing any supplement regimen. PickScope participates in the Amazon Associates Program and may earn commissions from qualifying purchases.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
