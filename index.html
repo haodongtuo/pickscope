@@ -3,8 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PickScope — Science-backed Supplement Recommendations</title>
-<link rel="manifest" href="/manifest.json">
+<title>PickScope — AI Supplement Recommender & Stack Safety Checker</title>
+
+  <!-- SEO Meta -->
+  <meta name="description" content="PickScope uses AI to recommend the right supplements for your goals, analyze label ingredients, and audit your full supplement & peptide stack for dangerous interactions, overdoses, and missing co-factors.">
+  <meta name="keywords" content="supplement recommender, supplement stack checker, supplement interaction checker, AI supplement recommendations, peptide stack safety, supplement label analyzer, stack auditor, vitamin interaction checker">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://pickscope.com/">
+  <meta name="author" content="PickScope">
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pickscope.com/">
+  <meta property="og:title" content="PickScope — AI Supplement Recommender & Stack Safety Checker">
+  <meta property="og:description" content="Get science-backed supplement recommendations, analyze your labels, and audit your full stack for dangerous interactions. Free AI-powered tool.">
+  <meta property="og:image" content="https://pickscope.com/logo512.png">
+  <meta property="og:site_name" content="PickScope">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://pickscope.com/">
+  <meta name="twitter:title" content="PickScope — AI Supplement Recommender & Stack Safety Checker">
+  <meta name="twitter:description" content="Get science-backed supplement recommendations, analyze your labels, and audit your full stack for dangerous interactions. Free AI-powered tool.">
+  <meta name="twitter:image" content="https://pickscope.com/logo512.png">
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PickScope",
+    "url": "https://pickscope.com",
+    "description": "AI-powered supplement recommender, label analyzer, and stack safety auditor. Get science-backed recommendations with Amazon product links.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "AI supplement recommendations",
+      "Supplement label analyzer",
+      "Supplement stack safety audit",
+      "Drug-peptide interaction detection",
+      "Ingredient dose audit vs clinical thresholds"
+    ]
+  }
+  </script>
+
+  <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#4A9EFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -332,6 +381,82 @@ main {
   main { padding: 0 16px 40px; }
   .logo-text { font-size: 1.4rem; }
 }
+
+/* ── PRO/BETA BADGE ── */
+.tab-pro { position: relative; }
+.pro-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #f59e0b, #10b981);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  margin-left: 4px;
+  pointer-events: none;
+}
+
+/* ── STACK AUDITOR ── */
+#tab-stack { padding-top: 24px; gap: 16px; }
+.stack-intro {
+  background: linear-gradient(135deg, rgba(74,158,255,0.08), rgba(239,68,68,0.06));
+  border: 1px solid rgba(74,158,255,0.2);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 4px;
+}
+.stack-features { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.stack-feature { font-size: 0.82rem; color: var(--text2); }
+@media (max-width: 480px) { .stack-features { grid-template-columns: 1fr; } }
+
+.audit-result { margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+.risk-header {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.risk-emoji { font-size: 2.4rem; }
+.risk-level { font-size: 1.1rem; font-weight: 800; }
+.risk-summary { font-size: 0.88rem; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+.audit-section {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+}
+.audit-section-title {
+  font-size: 0.75rem; font-weight: 700; color: var(--text2);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+}
+.interaction-item { padding: 12px 14px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid; }
+.interaction-item:last-child { margin-bottom: 0; }
+.interaction-item.CRITICAL { background: rgba(239,68,68,0.08); border-color: #ef4444; }
+.interaction-item.MODERATE { background: rgba(249,115,22,0.08); border-color: #f97316; }
+.interaction-item.INFO { background: rgba(74,158,255,0.06); border-color: #4A9EFF; }
+.interaction-label { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.severity-badge { font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.06em; }
+.severity-badge.CRITICAL { background: #ef4444; color: #fff; }
+.severity-badge.MODERATE { background: #f97316; color: #fff; }
+.severity-badge.INFO { background: #4A9EFF; color: #fff; }
+.interaction-substances { font-size: 0.85rem; font-weight: 600; }
+.interaction-explanation { font-size: 0.84rem; color: var(--text2); line-height: 1.55; margin: 6px 0; }
+.interaction-recommendation { font-size: 0.82rem; color: var(--green); font-weight: 500; }
+.stack-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+.stack-item:last-child { border-bottom: none; }
+.stack-item-name { font-size: 0.88rem; font-weight: 600; flex: 1; }
+.stack-item-cat { font-size: 0.72rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+.dose-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 5px; white-space: nowrap; }
+.dose-badge.APPROPRIATE { background: rgba(62,207,142,0.15); color: var(--green); }
+.dose-badge.SUB_THERAPEUTIC { background: rgba(249,115,22,0.15); color: #f97316; }
+.dose-badge.HIGH { background: rgba(239,68,68,0.15); color: #ef4444; }
+.dose-badge.UNKNOWN { background: rgba(160,160,160,0.12); color: var(--text2); }
+.timing-item, .cofactor-item, .monitor-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; line-height: 1.5; }
+.timing-item:last-child, .cofactor-item:last-child, .monitor-item:last-child { border-bottom: none; }
+.timing-icon { font-size: 1rem; flex-shrink: 0; }
+.timing-text strong { display: block; color: var(--text); }
+.timing-text span { color: var(--text2); font-size: 0.82rem; }
+.audit-disclaimer { font-size: 0.75rem; color: var(--text3); text-align: center; line-height: 1.6; padding: 12px; border-top: 1px solid var(--border); }
+
 </style>
 </head>
 <body>
@@ -345,6 +470,7 @@ main {
   <div class="tabs" style="margin-top:24px;">
     <button class="tab-btn active" data-tab="recommender">🔍 AI Recommender</button>
     <button class="tab-btn" data-tab="label">🏷️ Label Analyzer</button>
+    <button class="tab-btn tab-pro" data-tab="stack">Stack Auditor <span class="pro-badge">BETA</span></button>
   </div>
 </header>
 
@@ -406,6 +532,52 @@ main {
 
     <button class="analyze-label-btn" id="analyze-label-btn" style="display:none">Analyze Label</button>
     <div id="label-result-area"></div>
+  </div>
+
+
+  <!-- TAB 3: Stack Auditor (BETA) -->
+  <div class="tab-panel" id="tab-stack">
+
+    <div class="stack-intro">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <span style="font-size:1.8rem;">&#x26A1;</span>
+        <div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--text);">Stack Auditor</div>
+          <div style="font-size:0.82rem;color:var(--text2);">AI-powered safety analysis for complex supplement &amp; peptide stacks</div>
+        </div>
+        <span class="pro-badge" style="margin-left:auto;font-size:0.75rem;padding:4px 10px;">BETA &middot; FREE</span>
+      </div>
+      <div class="stack-features">
+        <div class="stack-feature">Detects dangerous drug-peptide interactions</div>
+        <div class="stack-feature">Audits every ingredient dose vs clinical thresholds</div>
+        <div class="stack-feature">Gives timing &amp; sequencing recommendations</div>
+        <div class="stack-feature">Flags missing co-factors &amp; what labs to monitor</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:var(--radius);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;">
+      <span style="font-size:1.2rem;flex-shrink:0;">&#x1F9EA;</span>
+      <div>
+        <div style="font-size:0.85rem;font-weight:700;color:#f59e0b;margin-bottom:4px;">Beta &mdash; Free During Testing</div>
+        <div style="font-size:0.82rem;color:var(--text2);line-height:1.6;">Stack Auditor is in early testing and currently <strong style="color:var(--text);">free to use</strong>. Looking for real feedback from people who run complex stacks. If you find a missing interaction or have suggestions &mdash; DM on Reddit (u/hudson-tuo).</div>
+      </div>
+    </div>
+
+    <div class="search-box" style="margin-bottom:16px;">
+      <textarea id="stack-input" rows="6"
+        placeholder="List everything you are currently taking:&#10;&#10;- BPC-157 250mcg/day subcutaneous&#10;- TB-500 5mg/week&#10;- GHK-Cu 1mg/day&#10;- Magnesium glycinate 400mg&#10;- Fish oil 3g/day&#10;- Metformin 500mg (prescribed)&#10;&#10;Include medications, peptides, supplements, doses if known."
+        style="width:100%;background:transparent;border:none;color:var(--text);font-size:0.93rem;padding:0;resize:none;outline:none;font-family:inherit;line-height:1.6;min-height:160px;"></textarea>
+    </div>
+    <div class="search-box" style="margin-bottom:20px;">
+      <textarea id="stack-context" rows="2"
+        placeholder="Optional: age, sex, health conditions, goals (e.g. 38M, recovering from knee surgery, goal is tissue repair)"
+        style="width:100%;background:transparent;border:none;color:var(--text2);font-size:0.88rem;padding:0;resize:none;outline:none;font-family:inherit;line-height:1.6;"></textarea>
+    </div>
+    <button class="search-btn" id="audit-btn" style="width:100%;justify-content:center;font-size:1rem;padding:14px;">
+      Run Safety Audit
+    </button>
+    <div id="audit-result-area"></div>
+
   </div>
 
 </main>
@@ -1169,6 +1341,114 @@ function triggerPwaInstall() {
     pwaBanner.classList.remove('show');
   });
 }
+
+
+// -- Stack Auditor --
+
+function getAuditSessionId() {
+  let sid = localStorage.getItem('ps_audit_session');
+  if (!sid) {
+    sid = 'audit_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+    localStorage.setItem('ps_audit_session', sid);
+  }
+  return sid;
+}
+
+document.getElementById('audit-btn').addEventListener('click', runAudit);
+
+function resetAudit() {
+  document.getElementById('audit-result-area').innerHTML = '';
+  document.getElementById('stack-input').value = '';
+  document.getElementById('stack-context').value = '';
+}
+
+async function runAudit() {
+  const stackInput = document.getElementById('stack-input').value.trim();
+  const userContext = document.getElementById('stack-context').value.trim();
+  const auditBtn = document.getElementById('audit-btn');
+  const resultArea = document.getElementById('audit-result-area');
+  if (stackInput.length < 5) { alert('Please describe your stack first.'); return; }
+  auditBtn.disabled = true;
+  auditBtn.textContent = 'Auditing your stack...';
+  resultArea.innerHTML = '<div style="color:var(--text2);padding:24px 0;text-align:center;">Analyzing interactions, checking doses, scanning for conflicts...</div>';
+  try {
+    const res = await fetch('/.netlify/functions/stack_audit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stackInput: stackInput, userContext: userContext, sessionId: getAuditSessionId() }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Audit failed');
+    resultArea.innerHTML = renderAuditResult(data);
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    resultArea.innerHTML = renderError(err.message);
+  } finally {
+    auditBtn.disabled = false;
+    auditBtn.textContent = 'Run Safety Audit';
+  }
+}
+
+function renderAuditResult(d) {
+  const riskColors = { LOW: 'var(--green)', MODERATE: '#f59e0b', HIGH: '#f97316', CRITICAL: '#ef4444' };
+  const riskColor = riskColors[d.overall_risk] || 'var(--text2)';
+
+  const interactionsHtml = (d.interactions || []).length === 0
+    ? '<div style="color:var(--green);font-size:0.88rem;padding:8px 0;">No significant interactions detected</div>'
+    : (d.interactions || []).map(function(i) {
+        return '<div class="interaction-item ' + i.severity + '">' +
+          '<div class="interaction-label">' +
+          '<span class="severity-badge ' + i.severity + '">' + i.severity + '</span>' +
+          '<span class="interaction-substances">' + (i.substances || []).join(' + ') + '</span>' +
+          '</div>' +
+          '<div style="font-size:0.78rem;font-weight:700;color:var(--text2);margin-bottom:4px;">' + (i.issue || '') + '</div>' +
+          '<div class="interaction-explanation">' + (i.explanation || '') + '</div>' +
+          (i.recommendation ? '<div class="interaction-recommendation">&rarr; ' + i.recommendation + '</div>' : '') +
+          '</div>';
+      }).join('');
+
+  const stackHtml = (d.stack_parsed || []).map(function(s) {
+    const doseLabel = s.dose_assessment === 'APPROPRIATE' ? 'Good dose' :
+      s.dose_assessment === 'SUB_THERAPEUTIC' ? 'Low dose' :
+      s.dose_assessment === 'HIGH' ? 'High dose' : 'Unknown';
+    return '<div class="stack-item">' +
+      '<div><div class="stack-item-name">' + s.name + '</div>' +
+      '<div class="stack-item-cat">' + (s.category || '') + (s.dose_stated ? ' &middot; ' + s.dose_stated : '') + '</div>' +
+      (s.dose_note ? '<div style="font-size:0.78rem;color:var(--text2);margin-top:2px;">' + s.dose_note + '</div>' : '') +
+      '</div>' +
+      '<span class="dose-badge ' + (s.dose_assessment || 'UNKNOWN') + '">' + doseLabel + '</span>' +
+      '</div>';
+  }).join('');
+
+  function makeSection(title, items, renderFn) {
+    if (!items || items.length === 0) return '';
+    return '<div class="audit-section"><div class="audit-section-title">' + title + '</div>' +
+      items.map(renderFn).join('') + '</div>';
+  }
+
+  const timingHtml = makeSection('Timing &amp; Sequencing', d.timing_recommendations, function(t) {
+    return '<div class="timing-item"><span class="timing-icon">&#x23F1;</span><div class="timing-text"><strong>' + t.instruction + '</strong><span>' + (t.reason || '') + '</span></div></div>';
+  });
+  const cofactorsHtml = makeSection('Missing Co-factors', d.missing_cofactors, function(c) {
+    return '<div class="cofactor-item"><span class="timing-icon">&#x1F9EA;</span><div class="timing-text"><strong>' + c.cofactor + (c.suggested_dose ? ' &middot; ' + c.suggested_dose : '') + '</strong><span>' + (c.why || '') + '</span></div></div>';
+  });
+  const monitorHtml = makeSection('What to Monitor', d.what_to_monitor, function(m) {
+    return '<div class="monitor-item"><span class="timing-icon">&#x1F4CA;</span><div class="timing-text"><strong>' + m.marker + (m.frequency ? ' &middot; ' + m.frequency : '') + '</strong><span>' + (m.why || '') + '</span></div></div>';
+  });
+
+  return '<div class="audit-result">' +
+    '<div class="risk-header"><span class="risk-emoji">' + (d.risk_emoji || '') + '</span>' +
+    '<div><div class="risk-level" style="color:' + riskColor + '">' + (d.overall_risk || '') + ' RISK</div>' +
+    '<div class="risk-summary">' + (d.risk_summary || '') + '</div></div></div>' +
+    '<div class="audit-section"><div class="audit-section-title">Interaction Scan</div>' + interactionsHtml + '</div>' +
+    '<div class="audit-section"><div class="audit-section-title">Stack Breakdown</div>' + stackHtml + '</div>' +
+    timingHtml + cofactorsHtml + monitorHtml +
+    (d.optimization_notes ? '<div class="audit-section"><div class="audit-section-title">Optimization Notes</div><p style="font-size:0.88rem;color:var(--text2);line-height:1.65;">' + d.optimization_notes + '</p></div>' : '') +
+    '<div class="audit-disclaimer">' + (d.disclaimer || 'For informational purposes only. Not medical advice.') + '</div>' +
+    '<button onclick="resetAudit()" style="background:none;border:1px solid var(--border);color:var(--text2);font-size:0.83rem;font-weight:600;padding:10px 20px;border-radius:8px;cursor:pointer;margin:8px auto 0;display:block;">&larr; New Audit</button>' +
+    '</div>';
+}
+
 </script>
 </body>
 </html>
