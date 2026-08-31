@@ -262,15 +262,18 @@ main {
   background: var(--bg3); border-radius: 0 0 8px 8px; margin-top: 1px;
 }
 
-/* ── AMAZON BTN ── */
-.amazon-btn {
-  display: block; background: var(--accent); color: #fff;
+/* ── STORE BTNS ── */
+.amazon-btn, .iherb-btn {
+  display: block; color: #fff;
   text-align: center; text-decoration: none;
   font-weight: 700; font-size: 0.87rem;
   padding: 12px; border-radius: 10px;
   transition: background 0.2s; margin-top: auto;
 }
+.amazon-btn { background: var(--accent); }
 .amazon-btn:hover { background: var(--accent2); }
+.iherb-btn { background: #5a9e3a; }
+.iherb-btn:hover { background: #4a8430; }
 
 /* ── CITATIONS ── */
 .citations-wrap { margin-top: 28px; width: 100%; }
@@ -846,10 +849,10 @@ function renderCard(p) {
       ${acc('⚠️ Considerations',     p.reasons.cons         || '—')}
     </div>
 
-    <a class="amazon-btn" href="${p.affiliate_link}" target="_blank" rel="noopener"
+    <a class="${p.platform === 'iHerb' ? 'iherb-btn' : 'amazon-btn'}" href="${p.affiliate_link}" target="_blank" rel="noopener"
       data-product-name="${(p.name||'').replace(/"/g,'&quot;')}"
       data-affiliate-link="${(p.affiliate_link||'').replace(/"/g,'&quot;')}"
-      onclick="logClick(this)">View on Amazon →</a>
+      onclick="logClick(this)">View on ${p.platform || 'Amazon'} →</a>
   </div>`;
 }
 

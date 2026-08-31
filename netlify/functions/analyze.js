@@ -469,7 +469,7 @@ Return a valid JSON object with this exact structure:
       "name": "Product Name by Brand",
       "match_type": "BEST MATCH" | "RUNNER UP" | "BUDGET PICK",
       "score": 92,
-      "platform": "Amazon",
+      "platform": "Amazon" | "iHerb",
       "price": "29.99",
       "rating": 4.7,
       "review_count": 12500,
@@ -525,7 +525,10 @@ Only populate `user_exit_data` if the user is clearly describing THEIR OWN past 
 - Always return exactly 3 products: BEST MATCH, RUNNER UP, BUDGET PICK
 - BEST MATCH = highest overall score; RUNNER UP = strong alternative; BUDGET PICK = best value under lower price
 - Score must reflect all 7 dimensions — do not inflate scores; a product with weak evidence or under-dosed ingredients should score 60–70 max
-- affiliate_link must be an Amazon search URL: https://www.amazon.com/s?k=SEARCH_TERMS&i=hpc&tag=pickscope-20. Use the most specific search terms possible: Brand name + exact product name + size/count (e.g., "Nature+Made+Melatonin+5mg+90+Tablets"). This ensures the target product appears first in results. Do NOT use amazon.com/dp/ links — ASINs cannot be reliably verified.
+- affiliate_link must use the correct format based on the product's platform:
+  - Amazon: https://www.amazon.com/s?k=SEARCH_TERMS&i=hpc&tag=pickscope-20 — use the most specific search terms (Brand + Product Name + Size/Count, e.g., "Nature+Made+Melatonin+5mg+90+Tablets"). Do NOT use amazon.com/dp/ links.
+  - iHerb: https://www.iherb.com/search#q=SEARCH_TERMS&rcode=IHERB_RCODE_PENDING — use URL-encoded search terms (Brand + Product Name + Size/Count).
+- Platform mix: Aim to include at least 1 iHerb recommendation when relevant products exist there. iHerb typically has better prices and broader selection for these brands: Jarrow Formulas, Now Foods, Thorne, Life Extension, Doctor's Best, Garden of Life, Solgar, Pure Encapsulations, Nordic Naturals, California Gold Nutrition, Source Naturals, Swanson. Default to Amazon for brands not commonly found on iHerb (e.g., Athletic Greens, Ritual, Momentous, Legion, Transparent Labs).
 - Include 3–5 high-quality scientific citations directly relevant to the key ingredients (real PubMed studies preferred)
 - reasons must be specific and scientifically grounded — avoid generic marketing language
 - Return ONLY the JSON object, no markdown, no extra text`;
