@@ -263,6 +263,26 @@ main {
 }
 
 /* ── STORE BTNS ── */
+.affiliate-disclosure {
+  font-size: 0.7rem;
+  color: var(--text3);
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.5;
+  padding: 0 4px;
+}
+
+.section-disclosure {
+  font-size: 0.72rem;
+  color: var(--text3);
+  text-align: center;
+  line-height: 1.6;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
 .amazon-btn, .iherb-btn {
   display: block; color: #fff;
   text-align: center; text-decoration: none;
@@ -853,6 +873,7 @@ function renderCard(p) {
       data-product-name="${(p.name||'').replace(/"/g,'&quot;')}"
       data-affiliate-link="${(p.affiliate_link||'').replace(/"/g,'&quot;')}"
       onclick="logClick(this)">View on ${p.platform || 'Amazon'} →</a>
+    <p class="affiliate-disclosure">PickScope earns a small commission from purchases via this link, at no extra cost to you. Recommendations are based solely on ingredient analysis — not commission rates.</p>
   </div>`;
 }
 
@@ -1008,7 +1029,8 @@ function renderResults(data) {
           </div>`).join('')}
       </div>
     </div>` : '';
-  return `${newSearchBtn}${mechanismHtml}${stabilityHtml}<div class="cards-wrap">${cards}</div>${citHTML}${pwaInstallNudge()}`;
+  const disclosureBanner = `<p class="section-disclosure">Affiliate Disclosure: PickScope earns a small commission if you purchase through our links, at no extra cost to you. All recommendations are determined solely by ingredient analysis and scientific evidence — never by commission rates.</p>`;
+  return `${newSearchBtn}${mechanismHtml}${stabilityHtml}${disclosureBanner}<div class="cards-wrap">${cards}</div>${citHTML}${pwaInstallNudge()}`;
 }
 
 // ── Accordion init ────────────────────────────────────────────
