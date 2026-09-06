@@ -756,7 +756,8 @@
 
   </div>
 
-  <!-- More Articles -->
+  <!-- More Articles (hidden until Load More is clicked) -->
+  <div id="more-articles-section" style="display:none;">
   <div class="section-heading" style="margin-top: 40px;">More Articles</div>
 
   <div class="article-grid">
@@ -812,6 +813,28 @@
       </div>
     </article>
 
+  </div>
+
+  </div><!-- /#more-articles-section -->
+
+  <!-- Load More Button -->
+  <div id="load-more-wrap" style="text-align:center;margin:36px 0 8px;">
+    <button id="load-more-btn" onclick="loadMoreArticles()" style="
+      background: none;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      color: var(--text2);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 13px 36px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    "
+    onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+    onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
+      Load More Articles ↓
+    </button>
   </div>
 
   <!-- Coming Soon Articles -->
@@ -875,5 +898,28 @@
   </div>
 </footer>
 
+<script>
+  function loadMoreArticles() {
+    var section = document.getElementById('more-articles-section');
+    var btn     = document.getElementById('load-more-btn');
+    var wrap    = document.getElementById('load-more-wrap');
+
+    if (section.style.display === 'none') {
+      // 展开
+      section.style.display = 'block';
+      section.style.opacity = '0';
+      section.style.transition = 'opacity 0.3s ease';
+      setTimeout(function() { section.style.opacity = '1'; }, 10);
+      btn.textContent = 'Show Less ↑';
+    } else {
+      // 收起
+      section.style.opacity = '0';
+      setTimeout(function() { section.style.display = 'none'; }, 300);
+      btn.textContent = 'Load More Articles ↓';
+      // 滚动回列表顶部
+      document.querySelector('.section-heading').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+</script>
 </body>
 </html>
